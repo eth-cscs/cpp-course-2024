@@ -1,0 +1,565 @@
+#+Title: 2024 CSCS C++ course: modules
+#+Email: mikael.simberg@cscs.ch
+
+#+OPTIONS: reveal_center:t reveal_progress:t reveal_history:t reveal_control:t
+#+OPTIONS: reveal_rolling_links:t reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: reveal_width:1600 reveal_height:1200
+#+OPTIONS: reveal_single_file:t
+#+OPTIONS: reveal_rolling_links:nil
+#+OPTIONS: reveal_title_slide:"<h1>%t</h1>2024-09-03"
+#+OPTIONS: toc:1
+#+REVEAL_MARGIN: 0.1
+#+REVEAL_MIN_SCALE: 1.0
+#+REVEAL_MAX_SCALE: 2.5
+#+REVEAL_TRANS: none
+#+REVEAL_HLEVEL: 2
+#+REVEAL_PLUGINS: (markdown notes math highlight)
+#+REVEAL_THEME: black
+
+* Intro: Why do we need modules? What are modules? And what are they not?
+** Repeated inclusion
+- Headers parsed again in each translation unit
+- Include guards required to avoid duplicate definitions
+- ~#pragma once~ is not standard
+** Transitive includes
+- TODO
+** ODR: One definition rule
+- Must have exactly one definition of every non-inline entity
+- Can have multiple inline definitions as long as they are the same
+- If you fail to follow this: undefined behaviour
+
+** Stateful includes
+#+begin_src c++
+#define NDEBUG
+#include <cassert>
+#+end_src
+
+#+begin_src c++
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#+end_src
+
+#+begin_src c++
+struct foo {
+#ifndef NDEBUG
+    int debug_var;
+#endif
+};
+#+end_src
+
+#+begin_src c++
+#define private public
+#+end_src
+
+#+begin_src c++
+#include <complex.h>
+template <std::size_t I> struct;
+#+end_src
+
+** Visibility
+#+begin_src c++
+struct foo {
+    private:
+        void bar();
+    public:
+        void baz();
+};
+#+end_src
+
+#+begin_src c++
+__attribute__((visibility("hidden"))) void foo() {}
+#+end_src
+** Modules
+- C++ modules encapsulate translation units more strongly than previously
+  - Names are attached to modules
+- Only globally defined preprocessor definitions (e.g. command line) can affect behaviour of module
+- No (forced) separation of interface and implementation to hide implementation
+- Import order does not matter
+- No huge includes due to transitive includes
+- Better compilation times
+- No include guards
+- No risk of missing required includes
+- Modules added in C++20
+- ~std~ and ~std.compat~ modules added in C++23
+
+** Modules are orthogonal to namespaces
+#+begin_src C++
+export module foo;
+
+namespace bar {
+    void baz();
+}
+#+end_src
+
+** Modules are not hierarchical
+- Modules can be named ~foo.bar.bar~
+- The standard couldn't care less, this is simply convention
+- ~foo:bar~ is a /module fragment/ ~bar~ inside the module ~foo~, to be covered later
+  - closest thing to a submodule, but only one level
+
+** Modules have no correspondence to filenames or the filesystem in general
+- Can have a module ~foo~ defined in a directory ~bar~ implemented in a file called ~baz.cpp~
+
+** Modules are not simple
+- Can't leave the entire header-world behind
+- Have to interoperate with libraries that don't provide modules
+- Need /global module fragment/
+- Need includes for macros (:sob:)
+
+* A brief overview of module structure and syntax
+
+- Playground: [[https://godbolt.org/z/qM91dTTvY]]
+
+** Consuming modules is simple
+
+#+begin_src C++
+import std;
+
+int main() {
+    std::println("hello");
+}
+#+end_src
+
+** Writing simple modules is simple
+#+begin_src C++
+// define the module interface
+export module foo;
+// import other modules
+import foo2;
+// internal definitions
+void bar() { std::cout << "bar\n"; }
+// exported definitions
+export void bar() { bar(); }
+export { void baz() { quack(); /* from foo2 */ } }
+#+end_src
+
+** Writing complicated modules is a bit more complicated
+
+- /module unit/
+- /module purview/
+- /global module/
+- /global module fragment/
+- /module interface unit/module implementation unit/
+- /primary module interface unit/
+- /module partition/
+- /private module fragment/
+
+** /Module unit/
+
+#+begin_quote
+A module unit is a translation unit that contains a module-declaration.
+
+--- https://eel.is/c++draft/module#unit-1
+#+end_quote
+
+#+begin_src C++
+// can only put some things here
+module foo;
+// this is part of the module
+#+end_src
+
+#+begin_src C++
+// also a module unit
+export module foo;
+#+end_src
+
+** /Module purview/
+
+#+begin_quote
+A module unit purview is the sequence of tokens starting at the module-declaration and extending to the end of the translation unit.
+
+--- https://eel.is/c++draft/module#unit-5
+#+end_quote
+
+#+begin_src C++
+// not module purview
+module foo;
+// module purview
+#+end_src
+
+** /Global module/
+
+#+begin_quote
+The global module is the collection of all global-module-fragments and all translation units that are not module units. Declarations appearing in such a context are said to be in the purview of the global module.
+
+--- https://eel.is/c++draft/module#unit-6
+#+end_quote
+
+** /Global module fragment/
+
+#+begin_quote
+A global-module-fragment specifies the contents of the global module fragment for a module unit.
+The global module fragment can be used to provide declarations that are attached to the global module and usable within the module unit.
+
+--- https://eel.is/c++draft/module#global.frag-2
+#+end_quote
+
+#+begin_src C++
+module;
+// global module fragment
+// "Prior to phase 4 of translation, only prepreocessing directives can appear here"
+#include <execution>
+module foo;
+#+end_src
+
+** /Module interface unit/Module implementation unit/
+
+#+begin_quote
+A module interface unit is a module unit whose module-declaration starts with export-keyword; any other module unit is a module implementation unit.
+
+--- https://eel.is/c++draft/module#unit-2
+#+end_quote
+
+#+begin_src C++
+// module interface unit
+// not a module implementation unit
+export module foo;
+#+end_src
+
+#+begin_src C++
+// module implementation unit
+// not a module interface unit
+module foo;
+#+end_src
+
+** /Primary module interface unit/
+
+#+begin_quote
+A named module shall contain exactly one module interface unit with no module-partition, known as the primary module interface unit of the module; no diagnostic is required.
+
+--- https://eel.is/c++draft/module#unit-2
+#+end_quote
+
+#+begin_src C++
+// primary module interface unit
+export module foo;
+#+end_src
+
+#+begin_src C++
+// can't have another module interface unit for foo
+// export module foo;
+#+end_src
+
+** /Module partition/
+
+#+begin_quote
+A module partition is a module unit whose module-declaration contains a module-partition.
+A named module shall not contain multiple module partitions with the same module-partition.
+All module partitions of a module that are module interface units shall be directly or indirectly exported by the primary module interface unit ([module.import]).
+No diagnostic is required for a violation of these rules.
+
+--- https://eel.is/c++draft/module#unit-3
+#+end_quote
+
+#+begin_src C++
+// module partition
+module foo:bar;
+#+end_src
+
+#+begin_src C++
+// module partition and interface unit
+export module foo:baz;
+#+end_src
+
+** /Private module fragment/
+
+#+begin_quote
+A private-module-fragment shall appear only in a primary module interface unit ([module.unit]).
+A module unit with a private-module-fragment shall be the only module unit of its module; no diagnostic is required.
+
+--- https://eel.is/c++draft/module#private.frag-1
+#+end_quote
+
+#+begin_src C++
+module foo;
+module :private;
+// private module fragment
+#+end_src
+
+* Modules in pika
+- Plan: convert pika to use modules ([[https://github.com/pika-org/pika]])
+- Probably more complicated than most other libraries, so you may get away with something simpler
+- Proof-of-concept implementation: [[https://github.com/pika-org/pika/compare/main...modules]]
+
+** Prerequisites
+- I used:
+  - clang 18.1.7
+  - cmake 3.29.3
+- GCC 14 also has relatively good support, but had some issues
+- Generally, the newer the better since things are being fixed rapidly
+- CUDA/HIP at the end: TODO?
+
+** pika's existing "module" structure
+- ~pika/~
+  - ~execution/~
+    - ~include/pika/execution/~
+      - ~algo.hpp~
+      - ...
+    - ~src/~
+      - ~algo.cpp~
+      - ...
+    - ~CMakeLists.txt~
+  - ~schedulers/~
+  - ~runtime/~
+  - ...
+
+** pika's existing "module" structure
+- Each "module" compiled into an object library
+- Object libraries linked into ~libpika.so~
+- Headers installed into single include directory from different modules
+- Users only see a single library, not the individual "modules"
+
+** pika's C++ modules structure
+- Each "module" becomes a C++ module: ~pika.execution~ etc.
+- Expose a high level module called ~pika.all~
+  - Reexports everything
+- Expose a high level module called ~pika~
+  - Reexports public API
+- Expose a module with /everything/ from pika as ~pika.all~ for testing
+- Want to keep existing headers as unchanged as possible to allow non-modules usage
+- Macros are handled separately
+- Mechanical translation of each "module" to a module
+
+** Step 1: defining a module
+#+begin_src C++
+// Global module fragment
+module;
+#include <type_traits>
+#include <boost/container/small_vector.hpp>
+// Other standard library and third party includes...
+// Module interface
+export module pika.execution;
+// Import other modules
+import pika.config;
+import pika.thread_pools;
+import pika.util;
+// Export everything that we had defined in the headers
+export {
+#include <pika/execution/algorithms/bulk.hpp>
+// ...
+#include <pika/execution/algorithms/when_all.hpp>
+}
+#+end_src
+
+** Step 2: header files
+#+begin_src C++
+// pika/execution/algorithms/bulk.hpp
+#pragma once // still required to avoid multiple definitions in module unit
+// Only preprocessor definitions, ok to include; could also be in the global module fragment or command line
+#include <pika/config.hpp>
+// Keep includes within the "module"
+#include <pika/execution/detail/partial_algorithm.hpp>
+// Don't include functionality from other pika modules; imported in primary module interface
+//#include <pika/functional/tag_invoke.hpp>
+// Already included in the global module fragment, will not get included again; can ifdef out
+//#include <functional>
+//#include <type_traits>
+//#include <utility>
+// Actual functionality, exported by the export block in the primary module interface
+namespace pika::execution {
+// ...
+}
+#+end_src
+
+** Step 3: cpp files
+
+#+begin_src C++
+// Don't use module keyword if not using modules
+module;
+// Don't include any pika headers here; declared or defined in primary module interface
+//#include <pika/execution/detail/helpers.hpp>
+//#include <pika/datastructures/variant.hpp>
+// TODO: Can I include it again? Yes, but exclude just for consistency?
+#include <pika/string_util/bad_lexical_cast.hpp>
+// Functionality used only in the implementation
+#include <typeinfo>
+// Define module
+module pika.execution;
+// Could import modules for private use here
+namespace pika::execution {
+// ...
+}
+#+end_src
+** Step 4: macros...
+- ~PIKA_ASSERT~, ~PIKA_LOG~, and ~PIKA_VERSION~ etc.
+- Ideal world
+  - constants become ~inline constexpr~ variables
+  - function-like macros use ~std::source_location~ and hope for inlining
+- Real world
+  - May need to use preprocessor to choose code paths
+    - constexpr-if can't be used in all contexts, e.g. defining members
+  - Logging/testing/assertion macros that print the expression
+
+** Step 4: macros...
+#+begin_src C++
+#include <pika/assertion.hpp>
+import pika;
+
+int main() {
+    PIKA_ASSERT(false);
+}
+#+end_src
+
+#+RESULTS:
+
+#+begin_src C++
+// pika/assertion.hpp
+// define macros only
+#ifdef PIKA_DEBUG
+#define PIKA_ASSERT(...) pika::handle_assertion(...);
+#else
+#defined PIKA_ASSERT(...)
+#endif
+#+end_src
+
+#+begin_src C++
+// assertion module
+module pika.assertion;
+export void pika::handle_assertion();
+#+end_src
+
+** Step 5: define ~pika.all~ module
+TODO
+
+** Step 6: define ~pika~ module
+TODO
+
+** Final result
+#+begin_src C++
+#include <fmt/printf.hpp>
+#include <stdexec/execution.hpp>
+#include <pika/assert.hpp>
+import pika;
+
+int main() {
+    pika::start();
+    bool result = stdexec::sync_wait(
+        stdexec::schedule(pika::execution::experimental::thread_pool_scheduler{}) |
+        stdexec::then([] { fmt::println("hello"); }));
+    PIKA_ASSERT(result);
+    pika::finalize();
+    pika::stop();
+}
+#+end_src
+
+** A better module implementation for pika?
+TODO
+- Don't export everything from every module
+  - Individually export names
+- "Modules" as module partitions
+  - Single CMake library target; currently each "module" is a separate object library
+  - Could use internals without exporting them to everyone
+** Build system support
+- Should be supported by CMake, meson, build2, and possibly others
+  - Only tried CMake
+
+#+begin_src cmake
+cmake_minimum_required(VERSION 3.28) # non-experimental in 3.28, import std in 3.30
+project(modules CXX) # must declare language
+add_library(lib)
+target_compile_features(lib PUBLIC cxx_std_20) # at least C++20
+target_sources(lib
+  PUBLIC
+  FILE_SET cxx_modules TYPE CXX_MODULES
+  FILES lib.cpp # module unit interfaces
+)
+target_sources(lib PRIVATE lib_impl.cpp) # module implementation units
+#+end_src
+
+** CMake issues
+TODO
+- segfault if files not in correct place
+- cmake does not correctly track dependencies on partial rebuilds?
+
+** GCC issues
+TODO
+- segfault including too many headers in global module fragment
+- segfault including spdlog
+
+** clang warnings
+TODO
+- includes in module purview
+- multiple definitions: foo@pika.bar
+- macro for module mod; module not found
+** assert/import
+TODO
+#+begin_src
+/home/mjs/src/pika/libs/pika/synchronization/src/stop_token.cpp:248:9: error: no member named 'string' in namespace 'std'
+  248 |         PIKA_ASSERT(stop_requested(state_.load(std::memory_order_acquire)));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/mjs/src/pika/libs/pika/assertion/include/pika/assert.hpp:64:54: note: expanded from macro 'PIKA_ASSERT'
+   64 | #   define PIKA_ASSERT(expr) PIKA_ASSERT_(expr, std::string())
+      |                                                 ~~~~~^
+#+end_src
+** uncast/static
+TODO
+#+begin_src C++
+In file included from /home/mjs/src/pika/libs/pika/synchronization/src/detail/condition_variable.cpp:26:
+/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:580:28: error: no matching function for call to 'uncast'
+  580 |    { return const_iterator(detail::uncast(this->get_end_node()), this->priv_value_traits_ptr()); }
+      |                            ^~~~~~~~~~~~~~
+/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:588:19: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::que
+ue_entry, boost::intrusive::slist_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::end' requested here
+  588 |    { return this->end(); }
+      |                   ^
+/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:1261:42: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::qu
+eue_entry, boost::intrusive::slist_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::cend' requested here
+ 1261 |          if(l) *l = this->previous(this->cend());
+      |                                          ^
+/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:1371:13: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::qu
+eue_entry, boost::intrusive::slist_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::splice_after' requested here
+ 1371 |    {  this->splice_after(this->previous(it), x, l);   }
+      |             ^
+/home/mjs/src/pika/libs/pika/synchronization/src/detail/condition_variable.cpp:224:15: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::queue_entry, boost::intrusive::slist_member_hook<boost::intrusive::li
+nk_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::splice' requested here
+  224 |         queue.splice(queue.end(), queue_);
+      |               ^
+#+end_src
+** Header units: not implemented in most compilers, likely won't be ever?
+TODO
+** Build times? Binary size?
+TODO
+** Where do BMIs go?
+TODO
+** ADL?
+TODO
+** extern c++
+TODO
+** import std
+TODO
+** Reexporting with using
+TODO
+** Compatibility between GCC and clang
+TODO
+** siof?
+TODO
+** Benefits? modules must be explicitly imported
+#+begin_src
+me/mjs/src/pika/libs/pika/threading/include/pika/threading/thread.hpp:40:23: error: declaration of 'function' must be imported from module 'pika.functional' before it is required
+   40 |         util::detail::function<void(std::exception_ptr const& e)>;
+      |                       ^
+#+end_src
+
+* Summary
+- Modules are
+  - useful
+  - complex
+  - immature
+- Should you use modules? Yes, with reservations
+  - Executables where noone depends on you
+  - No CUDA/HIP
+  - Otherwise, wait for better times
+
+** Resources
+- [[https://eel.is/c++draft/module]]
+- [[https://en.cppreference.com/w/cpp/language/modules]]
+- [[https://clang.llvm.org/docs/StandardCPlusPlusModules.html]]
+- [[https://gcc.gnu.org/wiki/cxx-modules]]
+- [[https://www.youtube.com/watch?v=iMNML689qlU]]
+- [[https://vector-of-bool.github.io/2019/03/10/modules-1.html]]
+- [[https://vector-of-bool.github.io/2019/03/31/modules-2.html]]
+- [[https://vector-of-bool.github.io/2019/10/07/modules-3.html]]
+- [[https://learn.microsoft.com/en-us/cpp/cpp/modules-cpp?view=msvc-170]]
+- [[https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/]]
+- [[https://www.kitware.com/import-cmake-c20-modules/]]
+- [[https://www.kitware.com/import-std-in-cmake-3-30/]]
