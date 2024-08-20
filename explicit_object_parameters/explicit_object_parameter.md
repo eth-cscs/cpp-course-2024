@@ -1137,12 +1137,12 @@ struct my_vector : std::vector<int> {
     auto negated(this my_vector self) {
         std::transform(self.begin(), self.end(), self.begin(),
             [](this auto, auto const& x) noexcept { return -x; });
-        return self;
+        return self; // no RVO
     }
     auto negated(this my_vector self) {
         std::transform(self.begin(), self.end(), self.begin(),
             [](this auto, auto const& x) noexcept { return -x; });
-        return self;
+        return self; // no RVO
     }
 };
 
@@ -1188,23 +1188,18 @@ my_vector::my_vector(my_vector&&)
 ```c++
 struct my_vector : std::vector<int> {
     using std::vector<int>::vector;
-    auto sorted(this my_vector self) {
-        std::sort(self.begin(), self.end());
-        return self;
+    template<typename Self>
+    auto sorted(this Self&& self) {
+        auto tmp = std::forward<Self>(self);
+        std::sort(tmp.begin(), tmp.end());
+        return tmp; // RVO
     }
     template<typename Self>
     auto negated(this Self&& self) {
         auto tmp = std::forward<Self>(self);
         std::transform(tmp.begin(), tmp.end(), tmp.begin(),
             [](this auto, auto const& x) noexcept { return -x; });
-        return tmp;
-    }
-    template<typename Self>
-    auto negated(this Self&& self) {
-        auto tmp = std::forward<Self>(self);
-        std::transform(tmp.begin(), tmp.end(), tmp.begin(),
-            [](this auto, auto const& x) noexcept { return -x; });
-        return tmp;
+        return tmp; // RVO
     }
 };
 auto v1 = my_vector{{1,2,3,4,5,6,7,8}}.sorted();
@@ -1236,6 +1231,7 @@ my_vector::my_vector(my_vector const&)
 
 </div>
 </div>
+
 ---
 
 # Explicit copy by value for lifetime management
