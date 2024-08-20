@@ -1077,13 +1077,13 @@ struct my_vector : std::vector<int> {
     auto negated() & {
         auto tmp = *this;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(),
-            [](this auto, auto const& x) noexcept { return -x; });
+            [](this auto, auto const& x) noexcept {return -x;});
         return tmp;
     }
     auto negated() && {
         auto tmp = std::move(*this);
         std::transform(tmp.begin(), tmp.end(), tmp.begin(),
-            [](this auto, auto const& x) noexcept { return -x; });
+            [](this auto, auto const& x) noexcept {return -x;});
         return tmp;
     }
 };
@@ -1132,16 +1132,11 @@ struct my_vector : std::vector<int> {
     using std::vector<int>::vector;
     auto sorted(this my_vector self) {
         std::sort(self.begin(), self.end());
-        return self;
-    }
-    auto negated(this my_vector self) {
-        std::transform(self.begin(), self.end(), self.begin(),
-            [](this auto, auto const& x) noexcept { return -x; });
         return self; // no RVO
     }
     auto negated(this my_vector self) {
         std::transform(self.begin(), self.end(), self.begin(),
-            [](this auto, auto const& x) noexcept { return -x; });
+            [](this auto, auto const& x) noexcept {return -x;});
         return self; // no RVO
     }
 };
@@ -1198,7 +1193,7 @@ struct my_vector : std::vector<int> {
     auto negated(this Self&& self) {
         auto tmp = std::forward<Self>(self);
         std::transform(tmp.begin(), tmp.end(), tmp.begin(),
-            [](this auto, auto const& x) noexcept { return -x; });
+            [](this auto, auto const& x) noexcept {return -x;});
         return tmp; // RVO
     }
 };
