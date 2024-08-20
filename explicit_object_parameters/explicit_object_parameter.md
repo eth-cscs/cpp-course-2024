@@ -906,8 +906,338 @@ test(
 
 # Explicit copy by value for chaining computations
 
+- goal: chain computations using member functions
+- example: vector class with
+    - `sorted()`: return sorted instance
+    - `negated()`: return instance with each element negated
+
+```c++
+auto v1 = my_vector{{1,2,3,4,5,6,7,8}}.sorted();
+auto v2 = my_vector{{1,2,3,4,5,6,7,8}}.sorted().negated();
+auto v3 = v1.negated();
+```
 
 ---
+
+# Explicit copy by value for chaining computations
+
+- with free functions version 1:
+
+<div class="twocolumns">
+<div>
+
+```c++
+template<typename Compare>
+auto sorted(my_vector v) { // pass v by value
+    std::sort(v.begin(), v.end());
+    return v; // no RVO!
+}
+
+auto negated(my_vector v) { // pass v by value
+    std::transform(v.begin(), v.end(), v.begin(),
+        [](this auto, auto const& x) noexcept { return -x; });
+    return v; // no RVO!
+}
+
+auto v1 = sorted(my_vector{1,2,3,4,5,6,7,8});
+auto v2 = negated(sorted(my_vector{1,2,3,4,5,6,7,8}));
+auto v3 = negated(v1);
+```
+
+</div>
+<div>
+
+```
+v1:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+
+v2:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+my_vector::my_vector(my_vector&&)
+
+v3:
+my_vector::my_vector(my_vector const&)
+my_vector::my_vector(my_vector&&)
+```
+
+- pass r-value: OK
+- pass l-value: Additional move constructor (no RVO)
+
+</div>
+</div>
+
+---
+
+# Explicit copy by value for chaining computations
+
+- with free functions version 2:
+
+<div class="twocolumns">
+<div>
+
+```c++
+template<typename Vector>
+requires (/* restrict to only my_vector types */)
+auto sorted(Vector&& v) { // pass by universal reference
+    auto tmp = std::forward<Vector>(v);
+    std::sort(tmp.begin(), tmp.end());
+    return tmp; // RVO!
+}
+
+template<typename Vector>
+requires (/* restrict to only my_vector types */)
+auto negated(Vector&& v) { // pass by universal reference
+    auto tmp = std::forward<Vector>(v);
+    std::transform(tmp.begin(), tmp.end(), tmp.begin(),
+        [](this auto, auto const& x) noexcept { return -x; });
+    return tmp; // RVO
+}
+
+auto v1 = sorted(my_vector{1,2,3,4,5,6,7,8});
+auto v2 = negated(sorted(my_vector{1,2,3,4,5,6,7,8}));
+auto v3 = negated(v1);
+```
+
+</div>
+<div>
+
+```
+v1:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+
+v2:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+my_vector::my_vector(my_vector&&)
+
+v3:
+my_vector::my_vector(my_vector const&)
+```
+
+- pass r-value: OK
+- pass l-value: OK
+
+</div>
+</div>
+
+---
+
+# Explicit copy by value for chaining computations
+
+- with member functions (traditional):
+
+<div class="twocolumns">
+<div>
+
+```c++
+struct my_vector : std::vector<int> {
+    using std::vector<int>::vector;
+
+    auto sorted() {
+        // ?
+    }
+
+    auto negated() {
+        // ?
+    }
+}
+```
+
+</div>
+<div>
+
+</div>
+</div>
+
+---
+
+# Explicit copy by value for chaining computations
+
+- with member functions (traditional):
+
+<div class="twocolumns">
+<div>
+
+```c++
+struct my_vector : std::vector<int> {
+    using std::vector<int>::vector;
+    auto sorted() & {
+        auto tmp = *this;
+        std::sort(tmp.begin(), tmp.end());
+        return tmp;
+    }
+    auto sorted() && {
+        auto tmp = std::move(*this);
+        std::sort(tmp.begin(), tmp.end());
+        return tmp;
+    }
+    auto negated() & {
+        auto tmp = *this;
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(),
+            [](this auto, auto const& x) noexcept { return -x; });
+        return tmp;
+    }
+    auto negated() && {
+        auto tmp = std::move(*this);
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(),
+            [](this auto, auto const& x) noexcept { return -x; });
+        return tmp;
+    }
+};
+```
+
+</div>
+<div>
+
+```c++
+auto v1 = my_vector{{1,2,3,4,5,6,7,8}}.sorted();
+auto v2 = my_vector{{1,2,3,4,5,6,7,8}}.sorted().negated();
+auto v3 = v1.negated();
+```
+
+```
+v1:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+
+v2:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+my_vector::my_vector(my_vector&&)
+
+v3:
+my_vector::my_vector(my_vector const&)
+```
+
+- pass r-value: OK
+- pass l-value: OK
+
+</div>
+</div>
+
+---
+
+# Explicit copy by value for chaining computations
+
+- with member functions (pass `this` by value):
+
+<div class="twocolumns">
+<div>
+
+```c++
+struct my_vector : std::vector<int> {
+    using std::vector<int>::vector;
+    auto sorted(this my_vector self) {
+        std::sort(self.begin(), self.end());
+        return self;
+    }
+    auto negated(this my_vector self) {
+        std::transform(self.begin(), self.end(), self.begin(),
+            [](this auto, auto const& x) noexcept { return -x; });
+        return self;
+    }
+    auto negated(this my_vector self) {
+        std::transform(self.begin(), self.end(), self.begin(),
+            [](this auto, auto const& x) noexcept { return -x; });
+        return self;
+    }
+};
+
+auto v1 = my_vector{{1,2,3,4,5,6,7,8}}.sorted();
+auto v2 = my_vector{{1,2,3,4,5,6,7,8}}.sorted().negated();
+auto v3 = v1.negated();
+```
+
+</div>
+<div>
+
+```
+v1:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+
+v2:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+my_vector::my_vector(my_vector&&)
+
+v3:
+my_vector::my_vector(my_vector const&)
+my_vector::my_vector(my_vector&&)
+```
+
+- pass r-value: OK
+- pass l-value: Additional move constructor (no RVO)
+- same problem as free function (by value)
+
+</div>
+</div>
+
+---
+
+# Explicit copy by value for chaining computations
+
+- with member functions (deducing `this`):
+
+<div class="twocolumns">
+<div>
+
+```c++
+struct my_vector : std::vector<int> {
+    using std::vector<int>::vector;
+    auto sorted(this my_vector self) {
+        std::sort(self.begin(), self.end());
+        return self;
+    }
+    template<typename Self>
+    auto negated(this Self&& self) {
+        auto tmp = std::forward<Self>(self);
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(),
+            [](this auto, auto const& x) noexcept { return -x; });
+        return tmp;
+    }
+    template<typename Self>
+    auto negated(this Self&& self) {
+        auto tmp = std::forward<Self>(self);
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(),
+            [](this auto, auto const& x) noexcept { return -x; });
+        return tmp;
+    }
+};
+auto v1 = my_vector{{1,2,3,4,5,6,7,8}}.sorted();
+auto v2 = my_vector{{1,2,3,4,5,6,7,8}}.sorted().negated();
+auto v3 = v1.negated();
+```
+
+</div>
+<div>
+
+```
+v1:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+
+v2:
+my_vector::my_vector{1,2,3,4,5,6,7,8}
+my_vector::my_vector(my_vector&&)
+my_vector::my_vector(my_vector&&)
+
+v3:
+my_vector::my_vector(my_vector const&)
+```
+
+- pass r-value: OK
+- pass l-value: OK
+- simpler than traditional
+- no need for constraints
+
+</div>
+</div>
+---
+
 # Explicit copy by value for lifetime management
 
 ---

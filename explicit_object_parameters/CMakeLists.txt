@@ -49,5 +49,6 @@ if (${CPP_COURSE_BUILD_CODE})
     add_example(tree)
     add_example(factory)
     add_example(member_function_ptr)
+    add_example(self_copy_chain)
 
 endif()
