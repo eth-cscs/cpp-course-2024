@@ -370,7 +370,7 @@ struct A : add_postfix_increment {
 };
 ```
 
-- `A` should only be able to inherit from `mixin` if it fulfills the interface
+- `A` should only be able to inherit from `add_postfix_increment` if it fulfills the interface
 - Print a human-readable error message if this is not the case
 
 </div>
@@ -916,33 +916,37 @@ auto v1 = my_vector{{1,2,3,4,5,6,7,8}}.sorted();
 auto v2 = my_vector{{1,2,3,4,5,6,7,8}}.sorted().negated();
 auto v3 = v1.negated();
 ```
+- avoid unnecessary copy/move operations
 
 ---
 
 # Explicit copy by value for chaining computations
 
-- with free functions version 1:
-
 <div class="twocolumns">
 <div>
+
+- with free functions (version 1):
 
 ```c++
 template<typename Compare>
 auto sorted(my_vector v) { // pass v by value
     std::sort(v.begin(), v.end());
-    return v; // no RVO!
+    return v; // no NRVO!
 }
 
 auto negated(my_vector v) { // pass v by value
     std::transform(v.begin(), v.end(), v.begin(),
         [](this auto, auto const& x) noexcept { return -x; });
-    return v; // no RVO!
+    return v; // no NRVO!
 }
 
 auto v1 = sorted(my_vector{1,2,3,4,5,6,7,8});
 auto v2 = negated(sorted(my_vector{1,2,3,4,5,6,7,8}));
 auto v3 = negated(v1);
 ```
+
+- pass r-value: OK
+- pass l-value: Additional move constructor (no NRVO)
 
 </div>
 <div>
@@ -962,8 +966,9 @@ my_vector::my_vector(my_vector const&)
 my_vector::my_vector(my_vector&&)
 ```
 
-- pass r-value: OK
-- pass l-value: Additional move constructor (no RVO)
+- Named Return Value Optimization
+    - copy or move are elided when returning by value
+    - forbidden if the returned name is a function parameter
 
 </div>
 </div>
@@ -972,10 +977,10 @@ my_vector::my_vector(my_vector&&)
 
 # Explicit copy by value for chaining computations
 
-- with free functions version 2:
-
 <div class="twocolumns">
 <div>
+
+- with free functions (version 2):
 
 ```c++
 template<typename Vector>
@@ -983,7 +988,7 @@ requires (/* restrict to only my_vector types */)
 auto sorted(Vector&& v) { // pass by universal reference
     auto tmp = std::forward<Vector>(v);
     std::sort(tmp.begin(), tmp.end());
-    return tmp; // RVO!
+    return tmp; // NRVO
 }
 
 template<typename Vector>
@@ -992,7 +997,7 @@ auto negated(Vector&& v) { // pass by universal reference
     auto tmp = std::forward<Vector>(v);
     std::transform(tmp.begin(), tmp.end(), tmp.begin(),
         [](this auto, auto const& x) noexcept { return -x; });
-    return tmp; // RVO
+    return tmp; // NRVO
 }
 
 auto v1 = sorted(my_vector{1,2,3,4,5,6,7,8});
@@ -1027,10 +1032,10 @@ my_vector::my_vector(my_vector const&)
 
 # Explicit copy by value for chaining computations
 
-- with member functions (traditional):
-
 <div class="twocolumns">
 <div>
+
+- with member functions (traditional):
 
 ```c++
 struct my_vector : std::vector<int> {
@@ -1056,10 +1061,10 @@ struct my_vector : std::vector<int> {
 
 # Explicit copy by value for chaining computations
 
-- with member functions (traditional):
-
 <div class="twocolumns">
 <div>
+
+- with member functions (traditional):
 
 ```c++
 struct my_vector : std::vector<int> {
@@ -1067,24 +1072,24 @@ struct my_vector : std::vector<int> {
     auto sorted() & {
         auto tmp = *this;
         std::sort(tmp.begin(), tmp.end());
-        return tmp;
+        return tmp; // NVRO
     }
     auto sorted() && {
         auto tmp = std::move(*this);
         std::sort(tmp.begin(), tmp.end());
-        return tmp;
+        return tmp; // NVRO
     }
     auto negated() & {
         auto tmp = *this;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(),
             [](this auto, auto const& x) noexcept {return -x;});
-        return tmp;
+        return tmp; // NVRO
     }
     auto negated() && {
         auto tmp = std::move(*this);
         std::transform(tmp.begin(), tmp.end(), tmp.begin(),
             [](this auto, auto const& x) noexcept {return -x;});
-        return tmp;
+        return tmp; // NVRO
     }
 };
 ```
@@ -1122,22 +1127,22 @@ my_vector::my_vector(my_vector const&)
 
 # Explicit copy by value for chaining computations
 
-- with member functions (pass `this` by value):
-
 <div class="twocolumns">
 <div>
+
+- with member functions (pass `this` by value):
 
 ```c++
 struct my_vector : std::vector<int> {
     using std::vector<int>::vector;
     auto sorted(this my_vector self) {
         std::sort(self.begin(), self.end());
-        return self; // no RVO
+        return self; // no NRVO!
     }
     auto negated(this my_vector self) {
         std::transform(self.begin(), self.end(), self.begin(),
             [](this auto, auto const& x) noexcept {return -x;});
-        return self; // no RVO
+        return self; // no NRVO!
     }
 };
 
@@ -1165,7 +1170,7 @@ my_vector::my_vector(my_vector&&)
 ```
 
 - pass r-value: OK
-- pass l-value: Additional move constructor (no RVO)
+- pass l-value: Additional move constructor (no NRVO)
 - same problem as free function (by value)
 
 </div>
@@ -1175,10 +1180,10 @@ my_vector::my_vector(my_vector&&)
 
 # Explicit copy by value for chaining computations
 
-- with member functions (deducing `this`):
-
 <div class="twocolumns">
 <div>
+
+- with member functions (deducing `this`):
 
 ```c++
 struct my_vector : std::vector<int> {
@@ -1187,14 +1192,14 @@ struct my_vector : std::vector<int> {
     auto sorted(this Self&& self) {
         auto tmp = std::forward<Self>(self);
         std::sort(tmp.begin(), tmp.end());
-        return tmp; // RVO
+        return tmp; // NRVO
     }
     template<typename Self>
     auto negated(this Self&& self) {
         auto tmp = std::forward<Self>(self);
         std::transform(tmp.begin(), tmp.end(), tmp.begin(),
             [](this auto, auto const& x) noexcept {return -x;});
-        return tmp; // RVO
+        return tmp; // NRVO
     }
 };
 auto v1 = my_vector{{1,2,3,4,5,6,7,8}}.sorted();
@@ -1229,7 +1234,69 @@ my_vector::my_vector(my_vector const&)
 
 ---
 
-# Explicit copy by value for lifetime management
+# Explicit copy by value for coroutine lifetime management
+
+- coroutines in c++: stackless, (potentially) allocate coroutine frame
+- parameters are copied into coroutine frame
+
+<div class="twocolumns">
+<div>
+
+```c++
+auto always(int const& val) -> std::generator<int> {
+    for (;;) { co_yield val; }
+}
+// 'val' above ends up being a dangling reference
+for (int i : always(42)) { ... }
+```
+
+</div>
+<div>
+
+```c++
+auto always(int val) -> std::generator<int> {
+    for (;;) { co_yield val; }
+}
+// ok: val is copied
+for (int i : always(42)) { ... }
+```
+
+</div>
+</div>
+
+- works for normal function parameters
+- member functions can be coroutines, too!
+
+<div class="twocolumns">
+<div>
+
+```c++
+struct C {
+    int val;
+    auto always() const -> std::generator<int> {
+        for (;;) { co_yield val; }
+    }
+};
+// 'this' above ends up being a dangling pointer
+for (int i : C{42}.always()) { ... }
+```
+
+</div>
+<div>
+
+```c++
+struct C {
+    int val;
+    auto always(this C c) -> std::generator<int> {
+        for (;;) { co_yield c.val; }
+    }
+};
+// ok: C is copied
+for (int i : C{42}.always()) { ... }
+```
+
+</div>
+</div>
 
 ---
 
