@@ -4,12 +4,12 @@ theme: cscs
 # class: lead
 paginate: true
 backgroundColor: #fff
-backgroundImage: url('../slides-support/common/4k-slide-bg-white.png')
+backgroundImage: url('./slides-support/common/4k-slide-bg-white.png')
 size: 16:9
 ---
 
 # **C++ Course 2024**
-![bg cover](../slides-support/common/title-bg3.png)
+![bg cover](./slides-support/common/title-bg3.png)
 <!-- _paginate: skip  -->
 <!-- _class: titlecover -->
 <!-- _footer: "" -->
