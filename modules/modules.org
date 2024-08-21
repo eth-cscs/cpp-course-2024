@@ -498,63 +498,6 @@ int main() {
   - Could use internals without exporting them to everyone
 - Translate macros to inline constexpr variables, inline functions, or compiler flag definitions
 
-* Selected issues and observations
-** CMake
-
-- Segfault if files not in
-- CMake/ninja does not always correctly track dependencies on partial rebuilds?
-  -
-
-** GCC
-
-- ICE including too many headers in global module fragment?
-  - No particular header triggers it, but fails when including "enough" headers
-- ICE including spdlog headers in global module fragment
-  - [[https://bugs.launchpad.net/ubuntu/+source/gcc-11/+bug/1945364]]?
-  - Disabled logging in pika's module branch
-
-** clang
-
-- includes in module purview
-- multiple definitions: foo@pika.bar
-- macro for module mod; module not found
-
-** assert/import
-TODO
-#+begin_src
-/home/mjs/src/pika/libs/pika/synchronization/src/stop_token.cpp:248:9: error: no member named 'string' in namespace 'std'
-  248 |         PIKA_ASSERT(stop_requested(state_.load(std::memory_order_acquire)));
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/mjs/src/pika/libs/pika/assertion/include/pika/assert.hpp:64:54: note: expanded from macro 'PIKA_ASSERT'
-   64 | #   define PIKA_ASSERT(expr) PIKA_ASSERT_(expr, std::string())
-      |                                                 ~~~~~^
-#+end_src
-** uncast/static
-TODO
-#+begin_src C++
-In file included from /home/mjs/src/pika/libs/pika/synchronization/src/detail/condition_variable.cpp:26:
-/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:580:28: error: no matching function for call to 'uncast'
-  580 |    { return const_iterator(detail::uncast(this->get_end_node()), this->priv_value_traits_ptr()); }
-      |                            ^~~~~~~~~~~~~~
-/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:588:19: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::que
-ue_entry, boost::intrusive::slist_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::end' requested here
-  588 |    { return this->end(); }
-      |                   ^
-/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:1261:42: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::qu
-eue_entry, boost::intrusive::slist_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::cend' requested here
- 1261 |          if(l) *l = this->previous(this->cend());
-      |                                          ^
-/home/mjs/src/spack/opt/spack/linux-nixos24-icelake/clang-18.1.7/boost-1.85.0-kppkj3cspk54vnmmct7kgghxjqx2vbrw/include/boost/intrusive/slist.hpp:1371:13: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::qu
-eue_entry, boost::intrusive::slist_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::splice_after' requested here
- 1371 |    {  this->splice_after(this->previous(it), x, l);   }
-      |             ^
-/home/mjs/src/pika/libs/pika/synchronization/src/detail/condition_variable.cpp:224:15: note: in instantiation of member function 'boost::intrusive::slist_impl<boost::intrusive::mhtraits<pika::detail::condition_variable::queue_entry, boost::intrusive::slist_member_hook<boost::intrusive::li
-nk_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queue_entry::slist_hook_>, unsigned long, 6, void>::splice' requested here
-  224 |         queue.splice(queue.end(), queue_);
-      |               ^
-#+end_src
-** Header units: not implemented in most compilers, likely won't be ever?
-TODO
 ** Build times
 
 | variant                 | libpika/1 thread       | libpika/4 threads\ast{}\ast{} | test executable\ast{} |
@@ -577,13 +520,156 @@ TODO
 - Possibly a small size benefit due to LTO-like behaviour with modules?
   - Too small sample size to draw general conclusions
 
-** Where do BMIs go?
-TODO
+* Miscellaneous issues, additional details
+** CMake
+
+- Segfault if files not in correct file set
+  - Implementation (also module) files are regular source files (added via ~target_sources~ or ~add_library~)
+  - Module interfaces must be in ~CXX_MODULES~ file set
+- CMake/ninja does not always correctly track dependencies on partial rebuilds?
+  - May be fixed with newer CMake or I'm using it wrong?
+
+** GCC
+
+- ICE including too many headers in global module fragment?
+  - No particular header triggers it, but fails when including "enough" headers
+- ICE including spdlog headers in global module fragment
+  - [[https://bugs.launchpad.net/ubuntu/+source/gcc-11/+bug/1945364]]?
+  - Disabled logging in pika's module branch
+- Does not support private module fragment
+
+** clang
+
+- Generally good, including error messages!
+- Header unit support is experimental
+- Warns about includes in module purview
+  - ~warning: '#include <filename>' attaches the declarations to the named module 'pika.preprocessor', which is not usually intended; consider moving that directive before module declaration~
+- Can't use macro to define module
+  - ~macro for module mod; module not found~
+  - confuses dependency scanner?
+#+begin_src C++
+#ifdef PIKA_HAVE_MODULE
+#define PIKA_MODULE_DECLARATION(name) module name;
+#else
+#define PIKA_MODULE_DECLARATION(name)
+#endif
+
+PIKA_MODULE_DECLARATION(pika.execution)
+
+** Name mangling
+
+- Names attached to a module ~m~ are suffixed with ~@m~
+- E.g. multiple definitions when including standard library headers in module purview
+#+begin_src bash
+error: reference to '__and_' is ambiguous
+...
+note: candidates are: 'template<class ... _Bn> struct std::__and_@pika.config'
+...
+note:                 'template<class ... _Bn> struct std::__and_'
+#+end_src
+
+** Including headers in multiple modules
+
+- Names are attached to a module, can't define or declare them in different modules
+- No forward declarations of names from other modules
+- E.g. including pika headers in different module purviews
+#+begin_src bash
+pika/libs/pika/type_support/include/pika/type_support/pack.hpp:17:12: error: cannot declare 'struct pika::util::detail::pack@pika.type_support<Ts>' in a different module
+   17 |     struct pack
+      |            ^~~~
+In file included from pika/build/spack/libs/pika/type_support/module.cpp:38,
+of module pika.type_support, imported at pika/build/spack/libs/pika/datastructures/module.cpp:26:
+pika/libs/pika/type_support/include/pika/type_support/pack.hpp:17:12: note: previously declared here
+   17 |     struct pack
+      |            ^~~~
+#+end_src
+
+** ~extern "C++"~
+
+- All definitions within the module purview attached to a module
+- Can use ~extern "C++"~ to not attach a name to the module
+- Use cases
+  - Mixing modules and non-modules usage
+  - CUDA/HIP translation units?
+    - definition can be in a non-module translation unit
+
+#+begin_src C++
+// fmt.cc
+// If you define FMT_ATTACH_TO_GLOBAL_MODULE
+//  - all declarations are detached from module 'fmt'
+//  - the module behaves like a traditional static library, too
+//  - all library symbols are mangled traditionally
+//  - you can mix TUs with either importing or #including the {fmt} API
+#ifdef FMT_ATTACH_TO_GLOBAL_MODULE
+extern "C++" {
+#endif
+#+end_src
+
+** static in headers
+
+- Static functions and variables included through headers in global module fragment are not visible in module purview
+  - Bug or feature?
+  - Locally patched Boost to remove ~static~
+  - Generally: avoid static functions and variables in headers, prefer ~inline~ / ~inline constexpr~
+
+#+begin_src bash
+In file included from /pika/libs/pika/synchronization/src/detail/condition_variable.cpp:26:
+include/boost/intrusive/slist.hpp:580:28: error: no matching function for call to 'uncast'
+  580 |    { return const_iterator(detail::uncast(this->get_end_node()), this->priv_value_traits_ptr()); }
+      |                            ^~~~~~~~~~~~~~
+#+end_src
+
+#+begin_src C++
+template<class ConstNodePtr>
+static typename uncast_types<ConstNodePtr>::non_const_pointer uncast(const ConstNodePtr & ptr)
+#+end_src
+** static in headers
+
+- Can't use static inside ~export {}~ block
+#+begin_src C++
+module foo;
+export {
+    #include <bar.hpp>
+}
+#+end_src
+
+#+begin_src C++
+// bar.hpp
+static bool bar = false;
+#+end_src
+
+#+begin_src bash
+bar.hpp: error: declaration of 'bar' with internal linkage cannot be exported
+#+end_src
+
+** Modules require explicit import
+
+- No more accidental transitive includes
+- If compiler knows where definition is, it may tell you what to import
+
+#+begin_src
+pika/libs/pika/threading/include/pika/threading/thread.hpp:40:23: error: declaration of 'function' must be imported from module 'pika.functional' before it is required
+   40 |         util::detail::function<void(std::exception_ptr const& e)>;
+      |                       ^
+#+end_src
+
+** import std
+
+- ~import std~ and ~import std.compat~ added in C++23
+  - ~std.compat~
+- Likely to be backported to C++20 mode by all major compiler vendors ([[https://github.com/microsoft/STL/issues/3945]])
+- CMake support requires 3.30, clang and libc++; did not test
+  - first clang (nixos) had broken libc++ installation?
+  - second clang (spack) was missing ~clang-scan-deps~ (used by CMake to discover module dependencies)
+- Used a modified version of [[https://github.com/DanielaE/std.module]] to include all dependencies through a module /for testing/
+  - Don't do this at home: pika effectively takes ownership of all its dependencies, making life difficult for dependees of pika
+  - Equivalent to vendoring dependencies, which is generally also a bad idea
+
 ** ADL?
 TODO
-** extern c++
+** Header units: not implemented in most compilers, likely won't be ever?
 TODO
-** import std
+** Where do BMIs go?
 TODO
 ** Reexporting with using
 TODO
@@ -591,13 +677,6 @@ TODO
 TODO
 ** siof?
 TODO
-** Benefits? modules must be explicitly imported
-#+begin_src
-me/mjs/src/pika/libs/pika/threading/include/pika/threading/thread.hpp:40:23: error: declaration of 'function' must be imported from module 'pika.functional' before it is required
-   40 |         util::detail::function<void(std::exception_ptr const& e)>;
-      |                       ^
-#+end_src
-
 * Summary
 - Modules are
   - useful
