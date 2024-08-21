@@ -131,8 +131,11 @@ import foo2;
 // internal definitions
 void bar() { std::cout << "bar\n"; }
 // exported definitions
-export void bar() { bar(); }
+export void bar();
 export { void baz() { quack(); /* from foo2 */ } }
+// internal functionality and definitions
+module :private;
+void bar() { bar(); }
 #+end_src
 
 ** Writing complicated modules is a bit more complicated
@@ -281,7 +284,7 @@ module :private;
 * Modules in pika
 - Plan: convert pika to use modules ([[https://github.com/pika-org/pika]])
 - Probably more complicated than most other libraries, so you may get away with something simpler
-- Proof-of-concept implementation: [[https://github.com/pika-org/pika/compare/main...modules]] (with ~import std;~: https://github.com/pika-org/pika/compare/main...modules)
+- Proof-of-concept implementation: [[https://github.com/pika-org/pika/compare/main...modules]] (with ~import std;~: https://github.com/pika-org/pika/compare/main...modules-import-std)
   - Beware: Frankenstein branch
 
 ** Prerequisites
@@ -291,7 +294,6 @@ module :private;
   - ninja 1.12.1
 - GCC 14 also has relatively good support, but had some issues
 - Generally, the newer the better since things are being fixed rapidly
-- CUDA/HIP at the end: TODO?
 
 ** pika's existing "module" structure
 - ~pika/~
@@ -319,21 +321,22 @@ module :private;
   - Reexports everything
 - Expose a high level module called ~pika~
   - Reexports public API
-- Expose a module with /everything/ from pika as ~pika.all~ for testing
 - Want to keep existing headers as unchanged as possible to allow non-modules usage
 - Macros are handled separately
 - Mechanical translation of each "module" to a module
 
 ** Step 1: defining a module
+- New ~module.cpp~ file generated for each pika module, defines module interface
 #+begin_src C++
 // Global module fragment
 module;
 #include <type_traits>
 #include <boost/container/small_vector.hpp>
 // Other standard library and third party includes...
+import std; // If available
 // Module interface
 export module pika.execution;
-// Import other modules
+// Import other pika modules
 import pika.config;
 import pika.thread_pools;
 import pika.util;
@@ -346,8 +349,8 @@ export {
 #+end_src
 
 ** Step 2: header files
+- Only keep includes internal to the module (and macro includes) in header files
 #+begin_src C++
-// pika/execution/algorithms/bulk.hpp
 #pragma once // still required to avoid multiple definitions in module unit
 // Only preprocessor definitions, ok to include; could also be in the global module fragment or command line
 #include <pika/config.hpp>
@@ -355,7 +358,7 @@ export {
 #include <pika/execution/detail/partial_algorithm.hpp>
 // Don't include functionality from other pika modules; imported in primary module interface
 //#include <pika/functional/tag_invoke.hpp>
-// Already included in the global module fragment, will not get included again; can ifdef out
+// If included in the global module fragment, will not get included again; if using std module don't include
 //#include <functional>
 //#include <type_traits>
 //#include <utility>
@@ -366,24 +369,23 @@ namespace pika::execution {
 #+end_src
 
 ** Step 3: cpp files
-
+- Transform cpp files to module implementation units
 #+begin_src C++
-// Don't use module keyword if not using modules
 module;
 // Don't include any pika headers here; declared or defined in primary module interface
 //#include <pika/execution/detail/helpers.hpp>
 //#include <pika/datastructures/variant.hpp>
-// TODO: Can I include it again? Yes, but exclude just for consistency?
-#include <pika/string_util/bad_lexical_cast.hpp>
-// Functionality used only in the implementation
+// #include <pika/string_util/bad_lexical_cast.hpp>
+// Functionality used only in the implementation; if using std module don't include, import std instead
 #include <typeinfo>
-// Define module
+// Module implementation unit
 module pika.execution;
 // Could import modules for private use here
 namespace pika::execution {
 // ...
 }
 #+end_src
+
 ** Step 4: macros...
 - ~PIKA_ASSERT~, ~PIKA_LOG~, and ~PIKA_VERSION~ etc.
 - Ideal world
@@ -395,6 +397,8 @@ namespace pika::execution {
   - Logging/testing/assertion macros that print the expression
 
 ** Step 4: macros...
+- Not all compilers support function-like macro definitions on the command line
+  - CMake will remove them if set through ~target_compile_definitions~, but can still pass them manually as compiler flags
 #+begin_src C++
 #include <pika/assertion.hpp>
 import pika;
@@ -403,8 +407,6 @@ int main() {
     PIKA_ASSERT(false);
 }
 #+end_src
-
-#+RESULTS:
 
 #+begin_src C++
 // pika/assertion.hpp
@@ -423,16 +425,57 @@ export void pika::handle_assertion();
 #+end_src
 
 ** Step 5: define ~pika.all~ module
-TODO
+
+#+begin_src C++
+module pika.all;
+
+export import pika.assertion;
+export import pika.execution;
+export import pika.runtime;
+// etc.
+#+end_src
 
 ** Step 6: define ~pika~ module
-TODO
 
-** Final result
+#+begin_src C++
+module pika;
+
+import pika.assertion;
+import pika.execution;
+import pika.runtime;
+// etc.
+
+namespace pika {
+export using ::pika::start; // Have to fully qualify names
+export using ::pika::stop;
+// etc.
+}
+#+end_src
+
+** CMake configuration
+- Should be supported by CMake, meson, build2, and possibly others
+  - Only tried CMake
+
+#+begin_src cmake
+cmake_minimum_required(VERSION 3.28) # non-experimental in 3.28, import std in 3.30
+project(modules CXX) # must declare language
+add_library(lib)
+target_compile_features(lib PUBLIC cxx_std_20) # at least C++20
+target_sources(lib
+  PUBLIC
+  FILE_SET cxx_modules TYPE CXX_MODULES # we're building C++ modules
+  FILES lib.cpp # module unit interfaces
+)
+target_sources(lib PRIVATE lib_impl.cpp) # module implementation units
+#+end_src
+
+** Test executable
+- NB. This particular example does not work on the ~modules~ branch since not all pika modules were translated
 #+begin_src C++
 #include <fmt/printf.hpp>
 #include <stdexec/execution.hpp>
 #include <pika/assert.hpp>
+import std;
 import pika;
 
 int main() {
@@ -447,44 +490,35 @@ int main() {
 #+end_src
 
 ** A better module implementation for pika?
-TODO
+
 - Don't export everything from every module
   - Individually export names
 - "Modules" as module partitions
   - Single CMake library target; currently each "module" is a separate object library
   - Could use internals without exporting them to everyone
-** Build system support
-- Should be supported by CMake, meson, build2, and possibly others
-  - Only tried CMake
+- Translate macros to inline constexpr variables, inline functions, or compiler flag definitions
 
-#+begin_src cmake
-cmake_minimum_required(VERSION 3.28) # non-experimental in 3.28, import std in 3.30
-project(modules CXX) # must declare language
-add_library(lib)
-target_compile_features(lib PUBLIC cxx_std_20) # at least C++20
-target_sources(lib
-  PUBLIC
-  FILE_SET cxx_modules TYPE CXX_MODULES
-  FILES lib.cpp # module unit interfaces
-)
-target_sources(lib PRIVATE lib_impl.cpp) # module implementation units
-#+end_src
+* Selected issues and observations
+** CMake
 
-** CMake issues
-TODO
-- segfault if files not in correct place
-- cmake does not correctly track dependencies on partial rebuilds?
+- Segfault if files not in
+- CMake/ninja does not always correctly track dependencies on partial rebuilds?
+  -
 
-** GCC issues
-TODO
-- segfault including too many headers in global module fragment
-- segfault including spdlog
+** GCC
 
-** clang warnings
-TODO
+- ICE including too many headers in global module fragment?
+  - No particular header triggers it, but fails when including "enough" headers
+- ICE including spdlog headers in global module fragment
+  - [[https://bugs.launchpad.net/ubuntu/+source/gcc-11/+bug/1945364]]?
+  - Disabled logging in pika's module branch
+
+** clang
+
 - includes in module purview
 - multiple definitions: foo@pika.bar
 - macro for module mod; module not found
+
 ** assert/import
 TODO
 #+begin_src
