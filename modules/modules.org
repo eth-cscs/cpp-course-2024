@@ -279,12 +279,14 @@ module :private;
 * Modules in pika
 - Plan: convert pika to use modules ([[https://github.com/pika-org/pika]])
 - Probably more complicated than most other libraries, so you may get away with something simpler
-- Proof-of-concept implementation: [[https://github.com/pika-org/pika/compare/main...modules]]
+- Proof-of-concept implementation: [[https://github.com/pika-org/pika/compare/main...modules]] (with ~import std;~: https://github.com/pika-org/pika/compare/main...modules)
+  - Beware: Frankenstein branch
 
 ** Prerequisites
 - I used:
   - clang 18.1.7
   - cmake 3.29.3
+  - ninja 1.12.1
 - GCC 14 also has relatively good support, but had some issues
 - Generally, the newer the better since things are being fixed rapidly
 - CUDA/HIP at the end: TODO?
@@ -517,8 +519,17 @@ nk_mode<boost::intrusive::normal_link>>, &pika::detail::condition_variable::queu
 #+end_src
 ** Header units: not implemented in most compilers, likely won't be ever?
 TODO
-** Build times? Binary size?
-TODO
+** Build times
+
+| variant                 | libpika/1 thread       | libpika/4 threads\ast{}\ast{} | test executable\ast{} |
+|-------------------------+------------------------+-------------------------------+-----------------------|
+| modules                 | 35-45 s (342 targets!) | 20-30 s                       | 2.5-3.5 s             |
+| no modules              | 115-130 s (72 targets) | 55-70 s                       | 7-8 s                 |
+| no modules (pch)        | 50-60 s                | 20-35 s                       | 3-5 s                 |
+| no modules (pch, unity) | 45-50 s (31 targets)   | 25-30 s                       | 3-5 s                 |
+\ast{} ~standalone_thread_pool_scheduler_test~
+
+\ast{}\ast{} benchmarks on noisy 4-core laptop; timing ranges from ~3 builds
 ** Where do BMIs go?
 TODO
 ** ADL?
@@ -563,3 +574,4 @@ me/mjs/src/pika/libs/pika/threading/include/pika/threading/thread.hpp:40:23: err
 - [[https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/]]
 - [[https://www.kitware.com/import-cmake-c20-modules/]]
 - [[https://www.kitware.com/import-std-in-cmake-3-30/]]
+- [[https://wg21.link/p1441]]
