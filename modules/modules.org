@@ -22,7 +22,9 @@
 - Include guards required to avoid duplicate definitions
 - ~#pragma once~ is not standard
 ** Transitive includes
-- TODO
+- Programs can compile without explicitly including everything they need
+- Break when transitive includes are removed
+  - [[https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes]]
 ** ODR: One definition rule
 - Must have exactly one definition of every non-inline entity
 - Can have multiple inline definitions as long as they are the same
