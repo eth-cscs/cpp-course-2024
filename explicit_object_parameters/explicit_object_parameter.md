@@ -984,7 +984,7 @@ my_vector::my_vector(my_vector&&)
 
 ```c++
 template<typename Vector>
-requires (/* restrict to only my_vector types */)
+requires (std::is_same_v<my_vector, std::remove_cvref_t<Vector>>)
 auto sorted(Vector&& v) { // pass by universal reference
     auto tmp = std::forward<Vector>(v);
     std::sort(tmp.begin(), tmp.end());
@@ -992,7 +992,7 @@ auto sorted(Vector&& v) { // pass by universal reference
 }
 
 template<typename Vector>
-requires (/* restrict to only my_vector types */)
+requires (std::is_same_v<my_vector, std::remove_cvref_t<Vector>>)
 auto negated(Vector&& v) { // pass by universal reference
     auto tmp = std::forward<Vector>(v);
     std::transform(tmp.begin(), tmp.end(), tmp.begin(),
@@ -1599,6 +1599,48 @@ result = std::invoke(baz_ptr, a, 2);
     - pointer to free function type
     - simpler to invoke
 - `std::invoke` can be used generically
+
+</div>
+</div>
+
+---
+
+# Takeaways
+
+<div class="twocolumns">
+<div>
+
+- makes implicit "self" explicit
+- replaces trailing value category
+- can be a template -> compiler deduces type
+- can be a value -> new semantics
+- member function pointers are different
+- applications for deduced `this`
+    - code deduplication
+    - simpler mixin
+    - constrained derived types
+    - recursive lambdas
+    - simplified overload pattern
+    - perfect-forwarding of captured values
+    - simplified computation chaining
+
+</div>
+<div>
+
+- applications for `this` as value
+    - lifetime management
+    - performance boost for small objects
+- Advantages
+    - more explicit, more better
+    - simpler to reason, simpler to teach?
+    - reduces code duplication
+    - potentially faster code
+    - enables many simplifications and new patterns
+- Downsides
+    - very few
+    - gotchas
+        - access base class members through deduced this
+        - return "self" passed by value
 
 </div>
 </div>
