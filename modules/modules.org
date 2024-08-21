@@ -530,6 +530,17 @@ TODO
 \ast{} ~standalone_thread_pool_scheduler_test~
 
 \ast{}\ast{} benchmarks on noisy 4-core laptop; timing ranges from ~3 builds
+
+** Binary sizes (release mode)
+
+| variant            | libpika.so    | test executable |
+|--------------------+---------------+-----------------|
+| modules            | 1767584 bytes | 414392 bytes    |
+| no modules (unity) | 1831248 bytes | 442560 bytes    |
+
+- Possibly a small size benefit due to LTO-like behaviour with modules?
+  - Too small sample size to draw general conclusions
+
 ** Where do BMIs go?
 TODO
 ** ADL?
