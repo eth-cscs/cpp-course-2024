@@ -332,18 +332,15 @@ module :private;
 module;
 #include <type_traits>
 #include <boost/container/small_vector.hpp>
-// Other standard library and third party includes...
 import std; // If available
 // Module interface
 export module pika.execution;
 // Import other pika modules
 import pika.config;
 import pika.thread_pools;
-import pika.util;
 // Export everything that we had defined in the headers
 export {
 #include <pika/execution/algorithms/bulk.hpp>
-// ...
 #include <pika/execution/algorithms/when_all.hpp>
 }
 #+end_src
@@ -389,12 +386,13 @@ namespace pika::execution {
 ** Step 4: macros...
 - ~PIKA_ASSERT~, ~PIKA_LOG~, and ~PIKA_VERSION~ etc.
 - Ideal world
-  - constants become ~inline constexpr~ variables
-  - function-like macros use ~std::source_location~ and hope for inlining
+  - Constants become ~inline constexpr~ variables
+  - Function-like macros use ~std::source_location~ and hope for inlining
 - Real world
   - May need to use preprocessor to choose code paths
-    - constexpr-if can't be used in all contexts, e.g. defining members
+    - Constexpr-if can't be used in all contexts, e.g. defining members
   - Logging/testing/assertion macros that print the expression
+  - Compatibility, i.e. not having to change everything at once
 
 ** Step 4: macros...
 - Not all compilers support function-like macro definitions on the command line
@@ -749,9 +747,9 @@ int main() {
 
 * Summary
 - Modules are
-  - useful
-  - immature
-  - complex, when used in the real world
+  - Useful
+  - Immature
+  - Complex, when used in the real world
 - *Should you use modules? Yes, with reservations*
   - Executables where noone depends on you
   - Then again, someone has to start using modules in libraries
