@@ -14,7 +14,7 @@
 #+REVEAL_TRANS: none
 #+REVEAL_HLEVEL: 2
 #+REVEAL_PLUGINS: (markdown notes math highlight)
-#+REVEAL_THEME: black
+#+REVEAL_THEME: night
 
 * Intro: Why do we need modules? What are modules? And what are they not?
 ** Repeated inclusion
