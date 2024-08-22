@@ -71,10 +71,10 @@ struct foo {
 #+begin_src c++
 __attribute__((visibility("hidden"))) void foo() {}
 #+end_src
-** Modules
+** C++ modules
 - C++ modules encapsulate translation units more strongly than previously
   - Names are attached to modules
-- Only globally defined preprocessor definitions (e.g. command line) can affect behaviour of module
+- Only preprocessor definitions set during compilation of module can affect its behaviour, it can't be changed anymore when importing
 - No (forced) separation of interface and implementation to hide implementation
 - Import order does not matter
 - No huge includes due to transitive includes
@@ -106,7 +106,7 @@ namespace bar {
 - Can't leave the entire header-world behind
 - Have to interoperate with libraries that don't provide modules
 - Need /global module fragment/
-- Need includes for macros (:sob:)
+- Need includes (or header units) for macros
 
 * A brief overview of module structure and syntax
 
@@ -520,7 +520,7 @@ int main() {
 - Possibly a small size benefit due to LTO-like behaviour with modules?
   - Too small sample size to draw general conclusions
 
-* Miscellaneous issues, additional details
+* Miscellaneous issues etc.
 ** CMake
 
 - Segfault if files not in correct file set
@@ -547,6 +547,7 @@ int main() {
 - Can't use macro to define module
   - ~macro for module mod; module not found~
   - confuses dependency scanner?
+
 #+begin_src C++
 #ifdef PIKA_HAVE_MODULE
 #define PIKA_MODULE_DECLARATION(name) module name;
@@ -555,6 +556,7 @@ int main() {
 #endif
 
 PIKA_MODULE_DECLARATION(pika.execution)
+#+end_src
 
 ** Name mangling
 
@@ -629,7 +631,7 @@ static typename uncast_types<ConstNodePtr>::non_const_pointer uncast(const Const
 #+begin_src C++
 module foo;
 export {
-    #include <bar.hpp>
+#include <bar.hpp>
 }
 #+end_src
 
@@ -656,7 +658,7 @@ pika/libs/pika/threading/include/pika/threading/thread.hpp:40:23: error: declara
 ** import std
 
 - ~import std~ and ~import std.compat~ added in C++23
-  - ~std.compat~
+  - ~std.compat~: /The named module std.compat exports the same declarations as the named module std, and additionally exports declarations in the global namespace corresponding to the declarations in namespace std that are provided by the C++ headers for C library facilities/
 - Likely to be backported to C++20 mode by all major compiler vendors ([[https://github.com/microsoft/STL/issues/3945]])
 - CMake support requires 3.30, clang and libc++; did not test
   - first clang (nixos) had broken libc++ installation?
@@ -665,26 +667,95 @@ pika/libs/pika/threading/include/pika/threading/thread.hpp:40:23: error: declara
   - Don't do this at home: pika effectively takes ownership of all its dependencies, making life difficult for dependees of pika
   - Equivalent to vendoring dependencies, which is generally also a bad idea
 
-** ADL?
-TODO
-** Header units: not implemented in most compilers, likely won't be ever?
-TODO
-** Where do BMIs go?
-TODO
-** Reexporting with using
-TODO
-** Compatibility between GCC and clang
-TODO
-** siof?
-TODO
+** ADL with modules
+
+- Big topic of /reachability/
+- Example from [[https://vector-of-bool.github.io/2019/10/07/modules-3.html]]
+
+#+begin_src C++
+// foo.hpp
+template <typename T>
+void do_something(T val) {
+    // ...
+}
+#+end_src
+
+#+begin_src C++
+module;
+#include "foo.hpp"
+export module acme;
+
+template <typename T>
+export void frombulate(T item) {
+    do_something(item);
+}
+#+end_src
+
+#+begin_src C++
+import acme;
+
+int main() {
+    frombulate(42); // ERROR: No matching overload of `do_something`!
+}
+#+end_src
+
+** ADL with modules
+
+- Big topic of /reachability/
+- Example from [[https://vector-of-bool.github.io/2019/10/07/modules-3.html]]
+
+#+begin_src C++
+// foo.hpp
+template <typename T>
+void do_something(T val) {
+    // ...
+}
+#+end_src
+
+#+begin_src C++
+module;
+#include "foo.hpp"
+export module acme;
+
+template <typename T>
+export void frombulate(T item) {
+    do_something(item);
+}
+
+export void use_it() {
+    frombulate(true);
+}
+#+end_src
+
+#+begin_src C++
+import acme;
+
+int main() {
+    frombulate(42); // ERROR: No matching overload of `do_something`!
+}
+#+end_src
+
+** Unexplored
+- Header units
+  - Should make headers importable as separate translation units
+  - Act similarly to precompiled headers, but built into the language
+  - Macros are usable through header units
+  - Not all headers can be imported
+- Built Module Interface (BMI)
+  - Installing and consuming libraries with modules
+- clang/GCC compatibility
+- CUDA/HIP compatibility
+- etc.
+
 * Summary
 - Modules are
   - useful
-  - complex
   - immature
-- Should you use modules? Yes, with reservations
+  - complex, when used in the real world
+- *Should you use modules? Yes, with reservations*
   - Executables where noone depends on you
-  - No CUDA/HIP
+  - Then again, someone has to start using modules in libraries
+  - No CUDA/HIP? clang to the rescue?
   - Otherwise, wait for better times
 
 ** Resources
@@ -698,6 +769,9 @@ TODO
 - [[https://vector-of-bool.github.io/2019/10/07/modules-3.html]]
 - [[https://learn.microsoft.com/en-us/cpp/cpp/modules-cpp?view=msvc-170]]
 - [[https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/]]
+- [[https://cmake.org/cmake/help/latest/manual/cmake-cxxmodules.7.html]]
 - [[https://www.kitware.com/import-cmake-c20-modules/]]
 - [[https://www.kitware.com/import-std-in-cmake-3-30/]]
 - [[https://wg21.link/p1441]]
+- [[https://wg21.link/p1689]]
+- [[https://wg21.link/p1788]]
