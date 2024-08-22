@@ -518,6 +518,16 @@ int main() {
 - Possibly a small size benefit due to LTO-like behaviour with modules?
   - Too small sample size to draw general conclusions
 
+** Build graph (no modules)
+
+#+NAME: fig:pika-config-nomodules-ninja
+[[./pika_nomodules_ninja.svg]]
+
+** Build graph (modules)
+
+#+NAME: fig:pika-config-modules-ninja
+[[./pika_modules_ninja.svg]]
+
 * Miscellaneous issues etc.
 ** CMake
 
