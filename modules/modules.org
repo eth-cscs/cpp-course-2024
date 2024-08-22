@@ -6,7 +6,6 @@
 #+OPTIONS: reveal_width:1600 reveal_height:1200
 #+OPTIONS: reveal_single_file:t
 #+OPTIONS: reveal_rolling_links:nil
-#+OPTIONS: reveal_title_slide:"<h1>%t</h1>2024-09-03"
 #+OPTIONS: toc:1
 #+REVEAL_MARGIN: 0.1
 #+REVEAL_MIN_SCALE: 1.0
@@ -14,6 +13,10 @@
 #+REVEAL_TRANS: none
 #+REVEAL_HLEVEL: 2
 #+REVEAL_PLUGINS: (markdown notes math highlight)
+#+REVEAL_TITLE_SLIDE_BACKGROUND: ./cpp_logo.png
+#+REVEAL_TITLE_SLIDE_BACKGROUND_REPEAT: repeat
+#+REVEAL_TITLE_SLIDE_BACKGROUND_SIZE: 100px
+#+REVEAL_TITLE_SLIDE_BACKGROUND_OPACITY: 0.05
 #+REVEAL_THEME: night
 
 * Intro: Why do we need modules? What are modules? And what are they not?
