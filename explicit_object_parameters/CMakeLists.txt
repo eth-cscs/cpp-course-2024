@@ -43,6 +43,7 @@ if (${CPP_COURSE_BUILD_CODE})
 
     add_example(explicit_object_parameters)
     add_example(derived_types)
+    add_example(derived_types_private)
     add_example(crtp)
     add_example(visitor)
     add_example(lambda)

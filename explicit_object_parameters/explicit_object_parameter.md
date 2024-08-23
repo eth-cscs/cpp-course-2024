@@ -219,6 +219,206 @@ d.baz() = 42
 
 ---
 
+# Deducing `this` for derived types: private inheritance
+
+<div class="twocolumns">
+<div>
+
+- private member in base class
+
+```c++
+struct base {
+    base(int m) : m_{m} {}
+
+    template<typename Self>
+    auto get(this Self const& self) {
+        return self.base::m_;
+    }
+
+  private:
+    int m_;
+};
+
+struct derived : base {
+    derived(int m) : base{m} {}
+};
+
+derived d{42};
+std::println("d.get() = {}", d.get());
+```
+
+</div>
+<div>
+
+- private inheritance
+
+```c++
+struct base {
+    base(int m) : m_{m} {}
+
+    template<typename Self>
+    auto get(this Self const& self) {
+        return self.base::m_;
+    }
+
+    int m_;
+};
+
+struct derived : private base {
+    derived(int m) : base{m} {}
+    using base::get;
+};
+
+derived d{42};
+std::println("d.get() = {}", d.get());
+```
+
+---
+
+# Deducing `this` for derived types: private inheritance
+
+<div class="twocolumns">
+<div>
+
+- private member in base class
+
+```c++
+struct base {
+    base(int m) : m_{m} {}
+
+    template<typename Self>
+    auto get(this Self const& self) {
+        return self.base::m_;
+    }
+
+  private:
+    int m_;
+};
+
+struct derived : base {
+    derived(int m) : base{m} {}
+};
+
+derived d{42};
+std::println("d.get() = {}", d.get());
+```
+
+</div>
+<div>
+
+- private inheritance
+
+```c++
+struct base {
+    base(int m) : m_{m} {}
+
+    template<typename Self>
+    auto get(this Self const& self) {
+        return self.base::m_;
+    }
+
+    int m_;
+};
+
+struct derived : private base {
+    derived(int m) : base{m} {}
+    using base::get;
+};
+
+derived d{42};
+std::println("d.get() = {}", d.get());
+```
+
+</div>
+</div>
+
+<div class="twocolumns">
+<div>
+
+- this works!
+
+</div>
+<div>
+
+- does not work!  No access to `base::m_`
+
+</div>
+</div>
+
+---
+
+# Deducing `this` for derived types: private inheritance
+
+<div class="twocolumns">
+<div>
+
+- private member in base class
+
+```c++
+struct base {
+    base(int m) : m_{m} {}
+
+    template<typename Self>
+    auto get(this Self const& self) {
+        return self.base::m_;
+    }
+
+  private:
+    int m_;
+};
+
+struct derived : base {
+    derived(int m) : base{m} {}
+};
+
+derived d{42};
+std::println("d.get() = {}", d.get());
+```
+
+</div>
+<div>
+
+- private inheritance
+
+```c++
+struct base {
+    base(int m) : m_{m} {}
+
+    template<typename Self>
+    auto get(this Self const& self) {
+        return ((base const&)self).m_;
+    }
+
+    int m_;
+};
+
+struct derived : private base {
+    derived(int m) : base{m} {}
+    using base::get;
+};
+
+derived d{42};
+std::println("d.get() = {}", d.get());
+```
+
+</div>
+</div>
+
+<div class="twocolumns">
+<div>
+
+- this works!
+
+</div>
+<div>
+
+- Workaround: C-cast
+
+</div>
+</div>
+
+---
+
 # Deducing `this` for Curiously Recurring Template Pattern
 
 <div class="twocolumns">
