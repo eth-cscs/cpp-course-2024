@@ -237,14 +237,15 @@ By far the most visible benefit of concepts lies in **clearer template error mes
 </div>
 
 ---
+<!-- _class: lead -->
+
 <div class="hcenter">
 
-# TODO
-
-Recapping what can we do with Concepts
+What can we do in terms of language expressiveness with Concepts?
 
 - constrain types
-- overloading
+- overloading functions
+- template class specialization
 
 <center>
 
@@ -255,6 +256,8 @@ Recapping what can we do with Concepts
 - SFINAE
 - tag dispatching
 - constexpr
+
+# Yes, but...
 
 <center>
 
@@ -436,7 +439,45 @@ template <std::floating_point R> R foo();
 
 Because when a constraint is not respected, the entire function is like it does not exist for that type. It is completely removed from the overload set.
 
-# TODO
+```cpp
+
+```
+
+</div>
+
+---
+
+<div class="hcenter">
+
+And it applies too class template specialization too!
+
+```cpp
+#include <concepts>
+
+template <class>
+struct X;
+
+template <std::floating_point T>
+struct X<T> : std::type_identity<float> {};
+
+template <std::integral T>
+struct X<T> : std::type_identity<int> {};
+
+template <>
+struct X<char> : std::type_identity<char> {};
+
+int main() {
+    static_assert(std::same_as<float, X<double>::type>);
+    static_assert(std::same_as<int, X<std::size_t>::type>);
+    static_assert(std::same_as<char, X<char>::type>);
+}
+```
+
+<center>
+
+https://godbolt.org/z/3cP9GMWhY
+
+</center>
 
 </div>
 
@@ -445,7 +486,10 @@ Because when a constraint is not respected, the entire function is like it does 
 
 <div class="hcenter">
 
-# TODO Write an overload set of functions that plays differently depending on type
+# TODO
+Write an overload set of functions that plays differently depending on type
+# TODO
+Or write an template class with different specializations
 
 </div>
 
@@ -546,9 +590,11 @@ void foo(T&& x);
 </div>
 
 ---
+<!-- _class: lead -->
+
 <div class="hcenter">
 
-Also an IILE (aka _"Immediately Invoked Lambda Expression"_) returning a `constexpr bool` is a valid constraint.
+Also an **IILE** (aka _"Immediately Invoked Lambda Expression"_) returning a `constexpr bool` is a valid constraint.
 
 ```cpp
 #include <source_location>
@@ -570,13 +616,6 @@ https://godbolt.org/z/hnWM9PTcr
 
 </center>
 
-<center>
-
-**TEASER**
-It is not just about bragging, actually this has some clever usage...
-
-</center>
-
 </div>
 
 ---
@@ -590,7 +629,7 @@ It is not just about bragging, actually this has some clever usage...
 
 <div class="hcenter">
 
-It's the same keyword, but previously we were talking about `requires`-clause, now we are introducing `requires`-expression!
+Yes, it's the same keyword...but previously we were talking about `requires`-clause, now we are introducing `requires`-expression!
 
 ```cpp
 requires (parameter-list) {
@@ -605,7 +644,7 @@ requires (parameter-list) {
 Useful to get "symbolic" entities for the sake of defining requirements.
 + Each requirement has to be **verified** in order for a requirement expression to be true
 
-A `requires`-expression returns `true` if all requirements are **verified**, otherwise `false`.
+A `requires`-expression is `true` if all requirements are **verified**, otherwise `false`.
 
 </div>
 
@@ -804,7 +843,11 @@ In a compound requirement
 
 `noexcept` and "return-type requirement" are optional
 
-# What's the difference?
+So we can have
+
+<div class="twocolumns">
+
+<div>
 
 **compound requirement**
 
@@ -812,15 +855,23 @@ In a compound requirement
 { expression };
 ```
 
+</div>
+<div>
+
 **simple requirement**
 
 ```cpp
 expression;
 ```
 
+</div>
+</div>
+
 <center>
 
-# <!--fit --> SOLUTION >>> https://timsong-cpp.github.io/cppwp/expr.prim.req.compound#2
+## What is the difference?
+
+**SOLUTION** https://eel.is/c++draft/expr.prim.req.compound#2
 
 </center>
 
@@ -829,14 +880,13 @@ expression;
 ---
 # `requires`-expression parameter list
 
+<div class="hcenter">
+
 <cite>
 
 A `requires`-expression can introduce local parameters using a parameter list. These parameters have no linkage, storage, or lifetime; they are only used as notation for the purpose of defining requirements.
 
 </cite>
-
-<div class="hcenter">
-
 
 ```cpp
 requires (T a, T b) {
@@ -844,20 +894,13 @@ requires (T a, T b) {
 };
 ```
 
-</div>
-
-
 Parameter list is somehow a shortand list of `declval`s you might want to use for requirement definition.
-
-<div class="hcenter">
 
 ```cpp
 requires {
     { declval<const T&>() == declval<const T&>() } -> std::same_as<bool>;
 };
 ```
-
-</div>
 
 ...and equivalently to `declval`, you can use them in unevaluated context (e.g. check type, check if builds) but not in evaluated context (because they don't actually exist).
 
@@ -874,9 +917,7 @@ and forget about about the horrendous `requires requires` construct
 
 <div class="hcenter">
 
-Till now we used already defined concepts, all the ones already available in STL.
-
-But we can define our ones!
+Till now we used already defined concepts, all the ones already available in STL. But we can define our ones!
 
 ```cpp
 template <class>
@@ -887,11 +928,12 @@ This defines a **named concept** where `bool_expression` can be whatever returns
 
 - a boolean expression of concepts
 - `type_trait`
+- IILE
 - ...
 
 <center>
 
-... or a `requires`-expression!
+## ... or a `requires`-expression!
 
 </center>
 
@@ -912,7 +954,7 @@ This defines a **named concept** where `bool_expression` can be whatever returns
 
 ```cpp
 template <class X>
-concept  = requires (X t) {
+concept ??? = requires (X t) {
     []<class... Args>(const std::tuple<Args...>&) {}(t);
 };
 ```
@@ -937,12 +979,22 @@ _"If it builds, `X` has to be ..."_
 
 # EXERCISE
 
-### TODO define a concept (number? addable? ...)
+<div class="hcenter">
 
-Useful Resources:
+**1. Define a concept for a `vector2d`, whose requirements are:**
+- you should be able to access its members as `x` and `y`
+- the type used for members should be a number. `bool` and `char` should not be considered valid. Pointers and reference neither.
+- `x` and `y` cannot have different types
 
-- https://en.cppreference.com/w/cpp/concepts#Standard_library_concepts
-- https://en.cppreference.com/w/cpp/iterator#Algorithm_concepts_and_utilities
+**2. Now define `vector3d` concept "extending" previous one.**
+
+<center>
+
+**SOLUTION** https://godbolt.org/z/7GMvWcdn6
+
+</center>
+
+</div>
 
 ---
 <!-- _backgroundColor: lightgreen -->
@@ -970,7 +1022,8 @@ Try implementing it using
 
 https://godbolt.org/z/E3rE4bcMq
 
-**Look at the errors**
+**Look at the errors in the different variants**
+(and with different compilers)
 
 </center>
 
@@ -978,13 +1031,8 @@ https://godbolt.org/z/E3rE4bcMq
 
 ---
 <!-- _class: lead -->
-# Concepts and Readable Errors
-
-<div class="hcenter">
-
-Do concepts improve errors? **Yes and no.**
-
-</div>
+# Concepts and Errors
+Do concepts improve error messages?
 
 ---
 
@@ -1157,6 +1205,133 @@ pre {
 
 ---
 
+<div class="hcenter">
+
+# Why concepts should improve error messages?
+
+# TODO
+
+The idea is that errors were detected too late, and now with concepts we can stop earlier the compiler.
+
+Indeed, with templates the full instantiation stack is created and if it turns out to be an error, the compiler dumps out all of it.
+
+Adding a requirement with concepts, beside being easier than before which encourages the good practice of constraining templates, it also creates intermediate error "detection" points.
+
+</div>
+
+---
+<!-- _class: lead -->
+
+# TODO
+# Also compilers can improve...
+"Concepts Error Messages for Humans" https://wg21.link/p2429
+
+---
+<!-- _class: lead -->
+
+# Concepts in reality
+
+---
+<!-- _class: lead -->
+
+# CRTP vs Concepts
+
+# TODO
+
+<div class="twocolumns">
+
+<div>
+
+```cpp
+template <class T>
+struct Shape {
+    void draw() const {
+        static_cast<const T*>(this)->draw();
+    }
+};
+
+struct Torus : Shape<Torus> {
+    void draw() const {
+        std::cout << "TORUS";
+    }
+};
+
+struct Cylinder : Shape<Cylinder> {
+    void draw() const {
+        std::cout << "CYLINDER";
+    }
+};
+```
+
+</div>
+
+<div>
+
+```cpp
+template <class T>
+concept Drawable = requires (T shape, const T& cshape) {
+    cshape.draw();
+};
+
+struct Torus {
+    void draw() const {
+        std::cout << "TORUS";
+    }
+};
+
+struct Cylinder {
+    void draw() const {
+        std::cout << "CYLINDER";
+    }
+};
+```
+
+</div>
+
+</div>
+
+- CRTP makes you decide if you want to "adopt" the interface, while with concepts it is "adopted" by default. Syntactically is correct, but semantically might not have sense.
+- with CRTP you can inject function in the interface, while with concept you can just have "free functions"
+- Previous point opens to a potential ADL issue: a user that defines a new type compatible with your library concept, cannot use free functions easily (either fully qualified name or some namespace workaround)
+
+---
+<!-- _class: lead -->
+# `if constexpr`
+
+<div class="hcenter">
+
+```cpp
+template <class T>
+struct P2D { T x, y; };
+
+template <class T>
+struct P3D : P2D<T> { T z; };
+
+template <class T>
+void print(const T& pt) {
+    std::cout << "(" << pt.x << ", " << pt.y;
+    if constexpr (requires { pt.z; })
+        std::cout << ", " << pt.z;
+    std::cout << ")" << std::endl;
+}
+```
+
+</div>
+
+---
+# Conclusions
+
+- **Are they nice?**
+Yes
+- **Are they the best we could have ever had?**
+No (e.g. concept maps...)
+- **Do they improve error messages?**
+Yes and No.
+- **Is it worth starting using them?**
+Yes, they simplify meta-programming in a lot of situations, improving code readability and expressiveness. Moreover it makes the code self-documenting.
+- **Is it a "go big or stay home" solution?**
+Not at all! They allow a very smooth transition. You can start even just by partially using them mixed with other solutions (e.g. same function/class overloaded/specialised with both old methods and concepts).
+
 ---
 <!-- _class: lead -->
 
@@ -1164,15 +1339,6 @@ pre {
 
 Alberto Invernizzi
 Research Software Engineer @ CSCS
-
----
-
-
-
-
-
-
-
 
 ---
 <!-- _class: lead -->
