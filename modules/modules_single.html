@@ -1,0 +1,1440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-08-22 Thu 11:24 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2024 CSCS C++ course: modules</title>
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">2024 CSCS C++ course: modules</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgecb0188">1. Intro: Why do we need modules? What are modules? And what are they not?</a></li>
+<li><a href="#org8290de2">2. A brief overview of module structure and syntax</a></li>
+<li><a href="#org3765455">3. Modules in pika</a></li>
+<li><a href="#org5c5f106">4. Miscellaneous issues etc.</a></li>
+<li><a href="#orgb18a204">5. Summary</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgecb0188" class="outline-2">
+<h2 id="orgecb0188"><span class="section-number-2">1.</span> Intro: Why do we need modules? What are modules? And what are they not?</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org3c66ab0" class="outline-3">
+<h3 id="org3c66ab0"><span class="section-number-3">1.1.</span> Repeated inclusion</h3>
+<div class="outline-text-3" id="text-1-1">
+<ul class="org-ul">
+<li>Headers parsed again in each translation unit</li>
+<li>Include guards required to avoid duplicate definitions</li>
+<li><code>#pragma once</code> is not standard</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7203547" class="outline-3">
+<h3 id="org7203547"><span class="section-number-3">1.2.</span> Transitive includes</h3>
+<div class="outline-text-3" id="text-1-2">
+<ul class="org-ul">
+<li>Programs can compile without explicitly including everything they need</li>
+<li>Break when transitive includes are removed
+<ul class="org-ul">
+<li><a href="https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes">https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes</a></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org239a147" class="outline-3">
+<h3 id="org239a147"><span class="section-number-3">1.3.</span> ODR: One definition rule</h3>
+<div class="outline-text-3" id="text-1-3">
+<ul class="org-ul">
+<li>Must have exactly one definition of every non-inline entity</li>
+<li>Can have multiple inline definitions as long as they are the same</li>
+<li>If you fail to follow this: undefined behaviour</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7ee6858" class="outline-3">
+<h3 id="org7ee6858"><span class="section-number-3">1.4.</span> Stateful includes</h3>
+<div class="outline-text-3" id="text-1-4">
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #757575;">#define</span> <span style="color: #004D40;">NDEBUG</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">cassert</span><span style="color: #3E2723;">&gt;</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #757575;">#define</span> <span style="color: #004D40;">WIN32_LEAN_AND_MEAN</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">Windows.h</span><span style="color: #3E2723;">&gt;</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #3E2723; font-weight: bold;">struct</span> <span style="color: #0D47A1;">foo</span> <span style="color: #3E2723;">{</span>
+<span style="color: #757575;">#if</span><span style="color: #757575;">n</span><span style="color: #757575;">def</span> <span style="color: #757575;">NDEBUG</span>
+    <span style="color: #0D47A1;">int</span> <span style="color: #004D40;">debug_var</span>;
+<span style="color: #757575;">#endif</span>
+<span style="color: #3E2723;">}</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #757575;">#define</span> <span style="color: #004D40;">private</span> <span style="color: #3E2723; font-weight: bold;">public</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">complex.h</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">template</span> <span style="color: #3E2723;">&lt;</span><span style="color: #757575;">std::</span><span style="color: #0D47A1;">size_t</span> <span style="color: #004D40;">I</span><span style="color: #3E2723;">&gt;</span> <span style="color: #3E2723; font-weight: bold;">struct</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9d18c32" class="outline-3">
+<h3 id="org9d18c32"><span class="section-number-3">1.5.</span> Visibility</h3>
+<div class="outline-text-3" id="text-1-5">
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #3E2723; font-weight: bold;">struct</span> <span style="color: #0D47A1;">foo</span> <span style="color: #3E2723;">{</span>
+    <span style="color: #3E2723; font-weight: bold;">private</span>:
+        <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">bar</span><span style="color: #000000;">()</span>;
+    <span style="color: #3E2723; font-weight: bold;">public</span>:
+        <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">baz</span><span style="color: #000000;">()</span>;
+<span style="color: #3E2723;">}</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span style="color: #3E2723; font-weight: bold;">__attribute__</span><span style="color: #3E2723;">(</span><span style="color: #000000;">(</span>visibility<span style="color: #1A237E;">(</span><span style="color: #1A237E;">"hidden"</span><span style="color: #1A237E;">)</span><span style="color: #000000;">)</span><span style="color: #3E2723;">)</span> <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">foo</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge805ce3" class="outline-3">
+<h3 id="orge805ce3"><span class="section-number-3">1.6.</span> C++ modules</h3>
+<div class="outline-text-3" id="text-1-6">
+<ul class="org-ul">
+<li>C++ modules encapsulate translation units more strongly than previously
+<ul class="org-ul">
+<li>Names are attached to modules</li>
+</ul></li>
+<li>Only preprocessor definitions set during compilation of module can affect its behaviour, it can&rsquo;t be changed anymore when importing</li>
+<li>No (forced) separation of interface and implementation to hide implementation</li>
+<li>Import order does not matter</li>
+<li>No huge includes due to transitive includes</li>
+<li>Better compilation times</li>
+<li>No include guards</li>
+<li>No risk of missing required includes</li>
+<li>Modules added in C++20</li>
+<li><code>std</code> and <code>std.compat</code> modules added in C++23</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf791443" class="outline-3">
+<h3 id="orgf791443"><span class="section-number-3">1.7.</span> Modules are orthogonal to namespaces</h3>
+<div class="outline-text-3" id="text-1-7">
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+
+<span style="color: #3E2723; font-weight: bold;">namespace</span> <span style="color: #757575;">bar</span> <span style="color: #3E2723;">{</span>
+    <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">baz</span><span style="color: #000000;">()</span>;
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7bda1cf" class="outline-3">
+<h3 id="org7bda1cf"><span class="section-number-3">1.8.</span> Modules are not hierarchical</h3>
+<div class="outline-text-3" id="text-1-8">
+<ul class="org-ul">
+<li>Modules can be named <code>foo.bar.bar</code></li>
+<li>The standard couldn&rsquo;t care less, this is simply convention</li>
+<li><code>foo:bar</code> is a <i>module fragment</i> <code>bar</code> inside the module <code>foo</code>, to be covered later
+<ul class="org-ul">
+<li>closest thing to a submodule, but only one level</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf2da462" class="outline-3">
+<h3 id="orgf2da462"><span class="section-number-3">1.9.</span> Modules have no correspondence to filenames or the filesystem in general</h3>
+<div class="outline-text-3" id="text-1-9">
+<ul class="org-ul">
+<li>Can have a module <code>foo</code> defined in a directory <code>bar</code> implemented in a file called <code>baz.cpp</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org8a64378" class="outline-3">
+<h3 id="org8a64378"><span class="section-number-3">1.10.</span> Modules are not simple</h3>
+<div class="outline-text-3" id="text-1-10">
+<ul class="org-ul">
+<li>Can&rsquo;t leave the entire header-world behind</li>
+<li>Have to interoperate with libraries that don&rsquo;t provide modules</li>
+<li>Need <i>global module fragment</i></li>
+<li>Need includes (or header units) for macros</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org8290de2" class="outline-2">
+<h2 id="org8290de2"><span class="section-number-2">2.</span> A brief overview of module structure and syntax</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>Playground: <a href="https://godbolt.org/z/qM91dTTvY">https://godbolt.org/z/qM91dTTvY</a></li>
+</ul>
+</div>
+<div id="outline-container-orgb6bcba4" class="outline-3">
+<h3 id="orgb6bcba4"><span class="section-number-3">2.1.</span> Consuming modules is simple</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">std</span>;
+
+<span style="color: #0D47A1;">int</span> <span style="color: #000000; font-weight: bold;">main</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span>
+    <span style="color: #757575;">std::</span>println<span style="color: #000000;">(</span><span style="color: #1A237E;">"hello"</span><span style="color: #000000;">)</span>;
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org22b575d" class="outline-3">
+<h3 id="org22b575d"><span class="section-number-3">2.2.</span> Writing simple modules is simple</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">define the module interface</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">import other modules</span>
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">foo2</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">internal definitions</span>
+<span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">bar</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span> <span style="color: #757575;">std::</span>cout &lt;&lt; <span style="color: #1A237E;">"bar\n"</span>; <span style="color: #3E2723;">}</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">exported definitions</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">bar</span><span style="color: #3E2723;">()</span>;
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723;">{</span> <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">baz</span><span style="color: #000000;">()</span> <span style="color: #000000;">{</span> quack<span style="color: #1A237E;">()</span>; <span style="color: #BDBDBD;">/* </span><span style="color: #BDBDBD;">from foo2</span><span style="color: #BDBDBD;"> */</span> <span style="color: #000000;">}</span> <span style="color: #3E2723;">}</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">internal functionality and definitions</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> :<span style="color: #3E2723; font-weight: bold;">private</span>;
+<span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">bar</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span> bar<span style="color: #000000;">()</span>; <span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf1b3359" class="outline-3">
+<h3 id="orgf1b3359"><span class="section-number-3">2.3.</span> Writing complicated modules is a bit more complicated</h3>
+<div class="outline-text-3" id="text-2-3">
+<ul class="org-ul">
+<li><i>module unit</i></li>
+<li><i>module purview</i></li>
+<li><i>global module</i></li>
+<li><i>global module fragment</i></li>
+<li><i>module interface unit/module implementation unit</i></li>
+<li><i>primary module interface unit</i></li>
+<li><i>module partition</i></li>
+<li><i>private module fragment</i></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga19b7e8" class="outline-3">
+<h3 id="orga19b7e8"><span class="section-number-3">2.4.</span> <i>Module unit</i></h3>
+<div class="outline-text-3" id="text-2-4">
+<blockquote>
+<p>
+A module unit is a translation unit that contains a module-declaration.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#unit-1">https://eel.is/c++draft/module#unit-1</a>
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">can only put some things here</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">this is part of the module</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">also a module unit</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org472c321" class="outline-3">
+<h3 id="org472c321"><span class="section-number-3">2.5.</span> <i>Module purview</i></h3>
+<div class="outline-text-3" id="text-2-5">
+<blockquote>
+<p>
+A module unit purview is the sequence of tokens starting at the module-declaration and extending to the end of the translation unit.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#unit-5">https://eel.is/c++draft/module#unit-5</a>
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">not module purview</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">module purview</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0e6de55" class="outline-3">
+<h3 id="org0e6de55"><span class="section-number-3">2.6.</span> <i>Global module</i></h3>
+<div class="outline-text-3" id="text-2-6">
+<blockquote>
+<p>
+The global module is the collection of all global-module-fragments and all translation units that are not module units. Declarations appearing in such a context are said to be in the purview of the global module.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#unit-6">https://eel.is/c++draft/module#unit-6</a>
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org4571085" class="outline-3">
+<h3 id="org4571085"><span class="section-number-3">2.7.</span> <i>Global module fragment</i></h3>
+<div class="outline-text-3" id="text-2-7">
+<blockquote>
+<p>
+A global-module-fragment specifies the contents of the global module fragment for a module unit.
+The global module fragment can be used to provide declarations that are attached to the global module and usable within the module unit.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#global.frag-2">https://eel.is/c++draft/module#global.frag-2</a>
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">global module fragment</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">"Prior to phase 4 of translation, only prepreocessing directives can appear here"</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">execution</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9dfa1d9" class="outline-3">
+<h3 id="org9dfa1d9"><span class="section-number-3">2.8.</span> <i>Module interface unit/Module implementation unit</i></h3>
+<div class="outline-text-3" id="text-2-8">
+<blockquote>
+<p>
+A module interface unit is a module unit whose module-declaration starts with export-keyword; any other module unit is a module implementation unit.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#unit-2">https://eel.is/c++draft/module#unit-2</a>
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">module interface unit</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">not a module implementation unit</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">module implementation unit</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">not a module interface unit</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org781f9d3" class="outline-3">
+<h3 id="org781f9d3"><span class="section-number-3">2.9.</span> <i>Primary module interface unit</i></h3>
+<div class="outline-text-3" id="text-2-9">
+<blockquote>
+<p>
+A named module shall contain exactly one module interface unit with no module-partition, known as the primary module interface unit of the module; no diagnostic is required.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#unit-2">https://eel.is/c++draft/module#unit-2</a>
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">primary module interface unit</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">can't have another module interface unit for foo</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">export module foo;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdbf6cbd" class="outline-3">
+<h3 id="orgdbf6cbd"><span class="section-number-3">2.10.</span> <i>Module partition</i></h3>
+<div class="outline-text-3" id="text-2-10">
+<blockquote>
+<p>
+A module partition is a module unit whose module-declaration contains a module-partition.
+A named module shall not contain multiple module partitions with the same module-partition.
+All module partitions of a module that are module interface units shall be directly or indirectly exported by the primary module interface unit ([module.import]).
+No diagnostic is required for a violation of these rules.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#unit-3">https://eel.is/c++draft/module#unit-3</a>
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">module partition</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>:<span style="color: #757575;">bar</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">module partition and interface unit</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>:<span style="color: #757575;">baz</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org763cb78" class="outline-3">
+<h3 id="org763cb78"><span class="section-number-3">2.11.</span> <i>Private module fragment</i></h3>
+<div class="outline-text-3" id="text-2-11">
+<blockquote>
+<p>
+A private-module-fragment shall appear only in a primary module interface unit ([module.unit]).
+A module unit with a private-module-fragment shall be the only module unit of its module; no diagnostic is required.
+</p>
+
+<p>
+&#x2014; <a href="https://eel.is/c++draft/module#private.frag-1">https://eel.is/c++draft/module#private.frag-1</a>
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+<span style="color: #3E2723; font-weight: bold;">module</span> :<span style="color: #3E2723; font-weight: bold;">private</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">private module fragment</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org3765455" class="outline-2">
+<h2 id="org3765455"><span class="section-number-2">3.</span> Modules in pika</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li>Plan: convert pika to use modules (<a href="https://github.com/pika-org/pika">https://github.com/pika-org/pika</a>)</li>
+<li>Probably more complicated than most other libraries, so you may get away with something simpler</li>
+<li>Proof-of-concept implementation: <a href="https://github.com/pika-org/pika/compare/main...modules">https://github.com/pika-org/pika/compare/main...modules</a> (with <code>import std;</code>: <a href="https://github.com/pika-org/pika/compare/main...modules-import-std">https://github.com/pika-org/pika/compare/main...modules-import-std</a>)
+<ul class="org-ul">
+<li>Beware: Frankenstein branch</li>
+</ul></li>
+</ul>
+</div>
+<div id="outline-container-org7039bda" class="outline-3">
+<h3 id="org7039bda"><span class="section-number-3">3.1.</span> Prerequisites</h3>
+<div class="outline-text-3" id="text-3-1">
+<ul class="org-ul">
+<li>I used:
+<ul class="org-ul">
+<li>clang 18.1.7</li>
+<li>cmake 3.29.3</li>
+<li>ninja 1.12.1</li>
+</ul></li>
+<li>GCC 14 also has relatively good support, but had some issues</li>
+<li>Generally, the newer the better since things are being fixed rapidly</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc460cf2" class="outline-3">
+<h3 id="orgc460cf2"><span class="section-number-3">3.2.</span> pika&rsquo;s existing &ldquo;module&rdquo; structure</h3>
+<div class="outline-text-3" id="text-3-2">
+<ul class="org-ul">
+<li><code>pika/</code>
+<ul class="org-ul">
+<li><code>execution/</code>
+<ul class="org-ul">
+<li><code>include/pika/execution/</code>
+<ul class="org-ul">
+<li><code>algo.hpp</code></li>
+<li>&#x2026;</li>
+</ul></li>
+<li><code>src/</code>
+<ul class="org-ul">
+<li><code>algo.cpp</code></li>
+<li>&#x2026;</li>
+</ul></li>
+<li><code>CMakeLists.txt</code></li>
+</ul></li>
+<li><code>schedulers/</code></li>
+<li><code>runtime/</code></li>
+<li>&#x2026;</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org58d87ed" class="outline-3">
+<h3 id="org58d87ed"><span class="section-number-3">3.3.</span> pika&rsquo;s existing &ldquo;module&rdquo; structure</h3>
+<div class="outline-text-3" id="text-3-3">
+<ul class="org-ul">
+<li>Each &ldquo;module&rdquo; compiled into an object library</li>
+<li>Object libraries linked into <code>libpika.so</code></li>
+<li>Headers installed into single include directory from different modules</li>
+<li>Users only see a single library, not the individual &ldquo;modules&rdquo;</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2237036" class="outline-3">
+<h3 id="org2237036"><span class="section-number-3">3.4.</span> pika&rsquo;s C++ modules structure</h3>
+<div class="outline-text-3" id="text-3-4">
+<ul class="org-ul">
+<li>Each &ldquo;module&rdquo; becomes a C++ module: <code>pika.execution</code> etc.</li>
+<li>Expose a high level module called <code>pika.all</code>
+<ul class="org-ul">
+<li>Reexports everything</li>
+</ul></li>
+<li>Expose a high level module called <code>pika</code>
+<ul class="org-ul">
+<li>Reexports public API</li>
+</ul></li>
+<li>Want to keep existing headers as unchanged as possible to allow non-modules usage</li>
+<li>Macros are handled separately</li>
+<li>Mechanical translation of each &ldquo;module&rdquo; to a module</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge6c3adb" class="outline-3">
+<h3 id="orge6c3adb"><span class="section-number-3">3.5.</span> Step 1: defining a module</h3>
+<div class="outline-text-3" id="text-3-5">
+<ul class="org-ul">
+<li>New <code>module.cpp</code> file generated for each pika module, defines module interface</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Global module fragment</span>
+<span style="color: #3E2723; font-weight: bold;">module</span>;
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">type_traits</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">boost/container/small_vector.hpp</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">std</span>; <span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">If available</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Module interface</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">pika.execution</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Import other pika modules</span>
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.config</span>;
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.thread_pools</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Export everything that we had defined in the headers</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723;">{</span>
+<span style="color: #757575;">#include</span> <span style="color: #000000;">&lt;</span><span style="color: #1A237E;">pika/execution/algorithms/bulk.hpp</span><span style="color: #000000;">&gt;</span>
+<span style="color: #757575;">#include</span> <span style="color: #000000;">&lt;</span><span style="color: #1A237E;">pika/execution/algorithms/when_all.hpp</span><span style="color: #000000;">&gt;</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0a9c535" class="outline-3">
+<h3 id="org0a9c535"><span class="section-number-3">3.6.</span> Step 2: header files</h3>
+<div class="outline-text-3" id="text-3-6">
+<ul class="org-ul">
+<li>Only keep includes internal to the module (and macro includes) in header files</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #757575;">#pragma once</span> <span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">still required to avoid multiple definitions in module unit</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Only preprocessor definitions, ok to include; could also be in the global module fragment or command line</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">pika/config.hpp</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Keep includes within the "module"</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">pika/execution/detail/partial_algorithm.hpp</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Don't include functionality from other pika modules; imported in primary module interface</span>
+<span style="color: #BDBDBD;">//</span><span style="color: #BDBDBD;">#include &lt;pika/functional/tag_invoke.hpp&gt;</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">If included in the global module fragment, will not get included again; if using std module don't include</span>
+<span style="color: #BDBDBD;">//</span><span style="color: #BDBDBD;">#include &lt;functional&gt;</span>
+<span style="color: #BDBDBD;">//</span><span style="color: #BDBDBD;">#include &lt;type_traits&gt;</span>
+<span style="color: #BDBDBD;">//</span><span style="color: #BDBDBD;">#include &lt;utility&gt;</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Actual functionality, exported by the export block in the primary module interface</span>
+<span style="color: #3E2723; font-weight: bold;">namespace</span> <span style="color: #757575;">pika::execution</span> <span style="color: #3E2723;">{</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">...</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd885f6c" class="outline-3">
+<h3 id="orgd885f6c"><span class="section-number-3">3.7.</span> Step 3: cpp files</h3>
+<div class="outline-text-3" id="text-3-7">
+<ul class="org-ul">
+<li>Transform cpp files to module implementation units</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Don't include any pika headers here; declared or defined in primary module interface</span>
+<span style="color: #BDBDBD;">//</span><span style="color: #BDBDBD;">#include &lt;pika/execution/detail/helpers.hpp&gt;</span>
+<span style="color: #BDBDBD;">//</span><span style="color: #BDBDBD;">#include &lt;pika/datastructures/variant.hpp&gt;</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">#include &lt;pika/string_util/bad_lexical_cast.hpp&gt;</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Functionality used only in the implementation; if using std module don't include, import std instead</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">typeinfo</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Module implementation unit</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">pika.execution</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Could import modules for private use here</span>
+<span style="color: #3E2723; font-weight: bold;">namespace</span> <span style="color: #757575;">pika::execution</span> <span style="color: #3E2723;">{</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">...</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga84f969" class="outline-3">
+<h3 id="orga84f969"><span class="section-number-3">3.8.</span> Step 4: macros&#x2026;</h3>
+<div class="outline-text-3" id="text-3-8">
+<ul class="org-ul">
+<li><code>PIKA_ASSERT</code>, <code>PIKA_LOG</code>, and <code>PIKA_VERSION</code> etc.</li>
+<li>Ideal world
+<ul class="org-ul">
+<li>Constants become <code>inline constexpr</code> variables</li>
+<li>Function-like macros use <code>std::source_location</code> and hope for inlining</li>
+</ul></li>
+<li>Real world
+<ul class="org-ul">
+<li>May need to use preprocessor to choose code paths
+<ul class="org-ul">
+<li>Constexpr-if can&rsquo;t be used in all contexts, e.g. defining members</li>
+</ul></li>
+<li>Logging/testing/assertion macros that print the expression</li>
+<li>Compatibility, i.e. not having to change everything at once</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org060049f" class="outline-3">
+<h3 id="org060049f"><span class="section-number-3">3.9.</span> Step 4: macros&#x2026;</h3>
+<div class="outline-text-3" id="text-3-9">
+<ul class="org-ul">
+<li>Not all compilers support function-like macro definitions on the command line
+<ul class="org-ul">
+<li>CMake will remove them if set through <code>target_compile_definitions</code>, but can still pass them manually as compiler flags</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">pika/assertion.hpp</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika</span>;
+
+<span style="color: #0D47A1;">int</span> <span style="color: #000000; font-weight: bold;">main</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span>
+    <span style="color: #757575;">PIKA_ASSERT</span><span style="color: #000000;">(</span><span style="color: #757575;">false</span><span style="color: #000000;">)</span>;
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">pika/assertion.hpp</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">define macros only</span>
+<span style="color: #757575;">#ifdef</span> <span style="color: #757575;">PIKA_DEBUG</span>
+<span style="color: #757575;">#define</span> <span style="color: #000000; font-weight: bold;">PIKA_ASSERT</span><span style="color: #3E2723;">(</span><span style="color: #000000; font-weight: bold;">...</span><span style="color: #3E2723;">)</span> <span style="color: #757575;">pika::</span>handle_assertion<span style="color: #3E2723;">(</span><span style="color: #000000; font-weight: bold;">...</span><span style="color: #3E2723;">)</span>;
+<span style="color: #757575;">#else</span>
+<span style="color: #757575;">#defined</span> <span style="color: #757575;">PIKA_ASSERT</span><span style="color: #3E2723;">(</span><span style="color: #000000; font-weight: bold;">...</span><span style="color: #3E2723;">)</span>
+<span style="color: #757575;">#endif</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">assertion module</span>
+<span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">pika.assertion</span>;
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #0D47A1;">void</span> <span style="color: #757575;">pika::</span><span style="color: #000000; font-weight: bold;">handle_assertion</span><span style="color: #3E2723;">()</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga096c9e" class="outline-3">
+<h3 id="orga096c9e"><span class="section-number-3">3.10.</span> Step 5: define <code>pika.all</code> module</h3>
+<div class="outline-text-3" id="text-3-10">
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">pika.all</span>;
+
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.assertion</span>;
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.execution</span>;
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.runtime</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">etc.</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4db6abb" class="outline-3">
+<h3 id="org4db6abb"><span class="section-number-3">3.11.</span> Step 6: define <code>pika</code> module</h3>
+<div class="outline-text-3" id="text-3-11">
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">pika</span>;
+
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.assertion</span>;
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.execution</span>;
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika.runtime</span>;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">etc.</span>
+
+<span style="color: #3E2723; font-weight: bold;">namespace</span> <span style="color: #757575;">pika</span> <span style="color: #3E2723;">{</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">using</span> <span style="color: #757575;">::pika::</span>start; <span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">Have to fully qualify names</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">using</span> <span style="color: #757575;">::pika::</span>stop;
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">etc.</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0ffca8d" class="outline-3">
+<h3 id="org0ffca8d"><span class="section-number-3">3.12.</span> CMake configuration</h3>
+<div class="outline-text-3" id="text-3-12">
+<ul class="org-ul">
+<li>Should be supported by CMake, meson, build2, and possibly others
+<ul class="org-ul">
+<li>Only tried CMake</li>
+</ul></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-cmake"><span style="color: #000000; font-weight: bold;">cmake_minimum_required</span>(VERSION <span style="color: #1A237E;">3.28</span>) <span style="color: #BDBDBD;"># </span><span style="color: #BDBDBD;">non-experimental in 3.28, import std in 3.30</span>
+<span style="color: #000000; font-weight: bold;">project</span>(modules CXX) <span style="color: #BDBDBD;"># </span><span style="color: #BDBDBD;">must declare language</span>
+<span style="color: #000000; font-weight: bold;">add_library</span>(lib)
+<span style="color: #000000; font-weight: bold;">target_compile_features</span>(lib PUBLIC cxx_std_20) <span style="color: #BDBDBD;"># </span><span style="color: #BDBDBD;">at least C++20</span>
+<span style="color: #000000; font-weight: bold;">target_sources</span>(lib
+  PUBLIC
+  FILE_SET cxx_modules TYPE CXX_MODULES <span style="color: #BDBDBD;"># </span><span style="color: #BDBDBD;">we're building C++ modules</span>
+  FILES lib.cpp <span style="color: #BDBDBD;"># </span><span style="color: #BDBDBD;">module unit interfaces</span>
+)
+<span style="color: #000000; font-weight: bold;">target_sources</span>(lib PRIVATE lib_impl.cpp) <span style="color: #BDBDBD;"># </span><span style="color: #BDBDBD;">module implementation units</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc32e08f" class="outline-3">
+<h3 id="orgc32e08f"><span class="section-number-3">3.13.</span> Test executable</h3>
+<div class="outline-text-3" id="text-3-13">
+<ul class="org-ul">
+<li>NB. This particular example does not work on the <code>modules</code> branch since not all pika modules were translated</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">fmt/printf.hpp</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">stdexec/execution.hpp</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #757575;">#include</span> <span style="color: #3E2723;">&lt;</span><span style="color: #1A237E;">pika/assert.hpp</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">std</span>;
+<span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">pika</span>;
+
+<span style="color: #0D47A1;">int</span> <span style="color: #000000; font-weight: bold;">main</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span>
+    <span style="color: #757575;">pika::</span>start<span style="color: #000000;">()</span>;
+    <span style="color: #0D47A1;">bool</span> <span style="color: #004D40;">result</span> = <span style="color: #757575;">stdexec::</span>sync_wait<span style="color: #000000;">(</span>
+        <span style="color: #757575;">stdexec::</span>schedule<span style="color: #1A237E;">(</span><span style="color: #757575;">pika::execution::experimental::</span>thread_pool_scheduler<span style="color: #4CAF50;">{}</span><span style="color: #1A237E;">)</span> |
+        <span style="color: #757575;">stdexec::</span>then<span style="color: #1A237E;">(</span><span style="color: #4CAF50;">[]</span> <span style="color: #4CAF50;">{</span> <span style="color: #757575;">fmt::</span>println<span style="color: #3E2723;">(</span><span style="color: #1A237E;">"hello"</span><span style="color: #3E2723;">)</span>; <span style="color: #4CAF50;">}</span><span style="color: #1A237E;">)</span><span style="color: #000000;">)</span>;
+    <span style="color: #757575;">PIKA_ASSERT</span><span style="color: #000000;">(</span>result<span style="color: #000000;">)</span>;
+    <span style="color: #757575;">pika::</span>finalize<span style="color: #000000;">()</span>;
+    <span style="color: #757575;">pika::</span>stop<span style="color: #000000;">()</span>;
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4eb64ab" class="outline-3">
+<h3 id="org4eb64ab"><span class="section-number-3">3.14.</span> A better module implementation for pika?</h3>
+<div class="outline-text-3" id="text-3-14">
+<ul class="org-ul">
+<li>Don&rsquo;t export everything from every module
+<ul class="org-ul">
+<li>Individually export names</li>
+</ul></li>
+<li>&ldquo;Modules&rdquo; as module partitions
+<ul class="org-ul">
+<li>Single CMake library target; currently each &ldquo;module&rdquo; is a separate object library</li>
+<li>Could use internals without exporting them to everyone</li>
+</ul></li>
+<li>Translate macros to inline constexpr variables, inline functions, or compiler flag definitions</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org49284b3" class="outline-3">
+<h3 id="org49284b3"><span class="section-number-3">3.15.</span> Build times</h3>
+<div class="outline-text-3" id="text-3-15">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">variant</th>
+<th scope="col" class="org-left">libpika/1 thread</th>
+<th scope="col" class="org-left">libpika/4 threads&lowast;&lowast;</th>
+<th scope="col" class="org-left">test executable&lowast;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">modules</td>
+<td class="org-left">35-45 s (342 targets!)</td>
+<td class="org-left">20-30 s</td>
+<td class="org-left">2.5-3.5 s</td>
+</tr>
+
+<tr>
+<td class="org-left">no modules</td>
+<td class="org-left">115-130 s (72 targets)</td>
+<td class="org-left">55-70 s</td>
+<td class="org-left">7-8 s</td>
+</tr>
+
+<tr>
+<td class="org-left">no modules (pch)</td>
+<td class="org-left">50-60 s</td>
+<td class="org-left">20-35 s</td>
+<td class="org-left">3-5 s</td>
+</tr>
+
+<tr>
+<td class="org-left">no modules (pch, unity)</td>
+<td class="org-left">45-50 s (31 targets)</td>
+<td class="org-left">25-30 s</td>
+<td class="org-left">3-5 s</td>
+</tr>
+</tbody>
+</table>
+<p>
+&lowast; <code>standalone_thread_pool_scheduler_test</code>
+</p>
+
+<p>
+&lowast;&lowast; benchmarks on noisy 4-core laptop; timing ranges from ~3 builds
+</p>
+</div>
+</div>
+<div id="outline-container-org5cfeeb5" class="outline-3">
+<h3 id="org5cfeeb5"><span class="section-number-3">3.16.</span> Binary sizes (release mode)</h3>
+<div class="outline-text-3" id="text-3-16">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">variant</th>
+<th scope="col" class="org-left">libpika.so</th>
+<th scope="col" class="org-left">test executable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">modules</td>
+<td class="org-left">1767584 bytes</td>
+<td class="org-left">414392 bytes</td>
+</tr>
+
+<tr>
+<td class="org-left">no modules (unity)</td>
+<td class="org-left">1831248 bytes</td>
+<td class="org-left">442560 bytes</td>
+</tr>
+</tbody>
+</table>
+
+<ul class="org-ul">
+<li>Possibly a small size benefit due to LTO-like behaviour with modules?
+<ul class="org-ul">
+<li>Too small sample size to draw general conclusions</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org9f34624" class="outline-3">
+<h3 id="org9f34624"><span class="section-number-3">3.17.</span> Build graph (no modules)</h3>
+<div class="outline-text-3" id="text-3-17">
+
+<div id="org874be35" class="figure">
+<p><img src="./pika_nomodules_ninja.svg" alt="pika_nomodules_ninja.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb7460d5" class="outline-3">
+<h3 id="orgb7460d5"><span class="section-number-3">3.18.</span> Build graph (modules)</h3>
+<div class="outline-text-3" id="text-3-18">
+
+<div id="org82a70aa" class="figure">
+<p><img src="./pika_modules_ninja.svg" alt="pika_modules_ninja.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org5c5f106" class="outline-2">
+<h2 id="org5c5f106"><span class="section-number-2">4.</span> Miscellaneous issues etc.</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org6987124" class="outline-3">
+<h3 id="org6987124"><span class="section-number-3">4.1.</span> CMake</h3>
+<div class="outline-text-3" id="text-4-1">
+<ul class="org-ul">
+<li>Segfault if files not in correct file set
+<ul class="org-ul">
+<li>Implementation (also module) files are regular source files (added via <code>target_sources</code> or <code>add_library</code>)</li>
+<li>Module interfaces must be in <code>CXX_MODULES</code> file set</li>
+</ul></li>
+<li>CMake/ninja does not always correctly track dependencies on partial rebuilds?
+<ul class="org-ul">
+<li>May be fixed with newer CMake or I&rsquo;m using it wrong?</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgfb7e5ab" class="outline-3">
+<h3 id="orgfb7e5ab"><span class="section-number-3">4.2.</span> GCC</h3>
+<div class="outline-text-3" id="text-4-2">
+<ul class="org-ul">
+<li>ICE including too many headers in global module fragment?
+<ul class="org-ul">
+<li>No particular header triggers it, but fails when including &ldquo;enough&rdquo; headers</li>
+</ul></li>
+<li>ICE including spdlog headers in global module fragment
+<ul class="org-ul">
+<li><a href="https://bugs.launchpad.net/ubuntu/+source/gcc-11/+bug/1945364">https://bugs.launchpad.net/ubuntu/+source/gcc-11/+bug/1945364</a>?</li>
+<li>Disabled logging in pika&rsquo;s module branch</li>
+</ul></li>
+<li>Does not support private module fragment</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org91b8f8a" class="outline-3">
+<h3 id="org91b8f8a"><span class="section-number-3">4.3.</span> clang</h3>
+<div class="outline-text-3" id="text-4-3">
+<ul class="org-ul">
+<li>Generally good, including error messages!</li>
+<li>Header unit support is experimental</li>
+<li>Warns about includes in module purview
+<ul class="org-ul">
+<li><code>warning: '#include &lt;filename&gt;' attaches the declarations to the named module 'pika.preprocessor', which is not usually intended; consider moving that directive before module declaration</code></li>
+</ul></li>
+<li>Can&rsquo;t use macro to define module
+<ul class="org-ul">
+<li><code>macro for module mod; module not found</code></li>
+<li>confuses dependency scanner?</li>
+</ul></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #757575;">#ifdef</span> <span style="color: #757575;">PIKA_HAVE_MODULE</span>
+<span style="color: #757575;">#define</span> <span style="color: #000000; font-weight: bold;">PIKA_MODULE_DECLARATION</span><span style="color: #3E2723;">(</span><span style="color: #004D40;">name</span><span style="color: #3E2723;">)</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">name</span>;
+<span style="color: #757575;">#else</span>
+<span style="color: #757575;">#define</span> <span style="color: #000000; font-weight: bold;">PIKA_MODULE_DECLARATION</span><span style="color: #3E2723;">(</span><span style="color: #004D40;">name</span><span style="color: #3E2723;">)</span>
+<span style="color: #757575;">#endif</span>
+
+<span style="color: #757575;">PIKA_MODULE_DECLARATION</span><span style="color: #3E2723;">(</span>pika.execution<span style="color: #3E2723;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb80b55f" class="outline-3">
+<h3 id="orgb80b55f"><span class="section-number-3">4.4.</span> Name mangling</h3>
+<div class="outline-text-3" id="text-4-4">
+<ul class="org-ul">
+<li>Names attached to a module <code>m</code> are suffixed with <code>@m</code></li>
+<li>E.g. multiple definitions when including standard library headers in module purview</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-bash">error: reference to <span style="color: #1A237E;">'__and_'</span> is ambiguous
+...
+note: candidates are: <span style="color: #1A237E;">'template&lt;class ... _Bn&gt; struct std::__and_@pika.config'</span>
+...
+note:                 <span style="color: #1A237E;">'template&lt;class ... _Bn&gt; struct std::__and_'</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5d583a4" class="outline-3">
+<h3 id="org5d583a4"><span class="section-number-3">4.5.</span> Including headers in multiple modules</h3>
+<div class="outline-text-3" id="text-4-5">
+<ul class="org-ul">
+<li>Names are attached to a module, can&rsquo;t define or declare them in different modules</li>
+<li>No forward declarations of names from other modules</li>
+<li>E.g. including pika headers in different module purviews</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-bash">pika/libs/pika/type_support/include/pika/type_support/pack.hpp:17:12: error: cannot declare <span style="color: #1A237E;">'struct pika::util::detail::pack@pika.type_support&lt;Ts&gt;'</span><span style="color: #3E2723; font-weight: bold;"> in</span> a different module
+   <span style="color: #1A237E;">17</span> |     struct pack
+      |            ^~~~
+In file included from pika/build/spack/libs/pika/type_support/module.cpp:38,
+of module pika.type_support, imported at pika/build/spack/libs/pika/datastructures/module.cpp:26:
+pika/libs/pika/type_support/include/pika/type_support/pack.hpp:17:12: note: previously declared here
+   <span style="color: #1A237E;">17</span> |     struct pack
+      |            ^~~~
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0c5968b" class="outline-3">
+<h3 id="org0c5968b"><span class="section-number-3">4.6.</span> <code>extern "C++"</code></h3>
+<div class="outline-text-3" id="text-4-6">
+<ul class="org-ul">
+<li>All definitions within the module purview attached to a module</li>
+<li>Can use <code>extern "C++"</code> to not attach a name to the module</li>
+<li>Use cases
+<ul class="org-ul">
+<li>Mixing modules and non-modules usage</li>
+<li>CUDA/HIP translation units?
+<ul class="org-ul">
+<li>definition can be in a non-module translation unit</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">fmt.cc</span>
+<span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">If you define FMT_ATTACH_TO_GLOBAL_MODULE</span>
+<span style="color: #BDBDBD;">//  </span><span style="color: #BDBDBD;">- all declarations are detached from module 'fmt'</span>
+<span style="color: #BDBDBD;">//  </span><span style="color: #BDBDBD;">- the module behaves like a traditional static library, too</span>
+<span style="color: #BDBDBD;">//  </span><span style="color: #BDBDBD;">- all library symbols are mangled traditionally</span>
+<span style="color: #BDBDBD;">//  </span><span style="color: #BDBDBD;">- you can mix TUs with either importing or #including the {fmt} API</span>
+<span style="color: #757575;">#ifdef</span> <span style="color: #757575;">FMT_ATTACH_TO_GLOBAL_MODULE</span>
+<span style="color: #3E2723; font-weight: bold;">extern</span> <span style="color: #1A237E;">"C++"</span> <span style="color: #3E2723;">{</span>
+<span style="color: #757575;">#endif</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf6983e5" class="outline-3">
+<h3 id="orgf6983e5"><span class="section-number-3">4.7.</span> static in headers</h3>
+<div class="outline-text-3" id="text-4-7">
+<ul class="org-ul">
+<li>Static functions and variables included through headers in global module fragment are not visible in module purview
+<ul class="org-ul">
+<li>Bug or feature?</li>
+<li>Locally patched Boost to remove <code>static</code></li>
+<li>Generally: avoid static functions and variables in headers, prefer <code>inline</code> / <code>inline constexpr</code></li>
+</ul></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-bash">In file included from /pika/libs/pika/synchronization/src/detail/condition_variable.cpp:26:
+include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color: #3E2723; font-weight: bold;">function</span> <span style="color: #000000; font-weight: bold;">for</span> call to <span style="color: #1A237E;">'uncast'</span>
+  <span style="color: #1A237E;">580</span> |    <span style="color: #3E2723;">{</span> <span style="color: #3E2723; font-weight: bold;">return</span> const_iterator<span style="color: #000000;">(</span>detail::uncast<span style="color: #1A237E;">(</span>this-&gt;get_end_node<span style="color: #4CAF50;">()</span><span style="color: #1A237E;">)</span>, this-&gt;priv_value_traits_ptr<span style="color: #1A237E;">()</span><span style="color: #000000;">)</span>; <span style="color: #3E2723;">}</span>
+      |                            ^~~~~~~~~~~~~~
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">template</span><span style="color: #3E2723;">&lt;</span><span style="color: #3E2723; font-weight: bold;">class</span> <span style="color: #0D47A1;">ConstNodePtr</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">static</span> <span style="color: #3E2723; font-weight: bold;">typename</span> <span style="color: #0D47A1;">uncast_types</span><span style="color: #3E2723;">&lt;</span>ConstNodePtr<span style="color: #3E2723;">&gt;</span><span style="color: #757575;">::</span>non_const_pointer uncast<span style="color: #3E2723;">(</span><span style="color: #3E2723; font-weight: bold;">const</span> ConstNodePtr &amp; ptr<span style="color: #3E2723;">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org15c81c2" class="outline-3">
+<h3 id="org15c81c2"><span class="section-number-3">4.8.</span> static in headers</h3>
+<div class="outline-text-3" id="text-4-8">
+<ul class="org-ul">
+<li>Can&rsquo;t use static inside <code>export {}</code> block</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723;">{</span>
+<span style="color: #757575;">#include</span> <span style="color: #000000;">&lt;</span><span style="color: #1A237E;">bar.hpp</span><span style="color: #000000;">&gt;</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">bar.hpp</span>
+<span style="color: #3E2723; font-weight: bold;">static</span> <span style="color: #0D47A1;">bool</span> <span style="color: #004D40;">bar</span> = <span style="color: #757575;">false</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash">bar.hpp: error: declaration of <span style="color: #1A237E;">'bar'</span> with internal linkage cannot be exported
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgfef3548" class="outline-3">
+<h3 id="orgfef3548"><span class="section-number-3">4.9.</span> Modules require explicit import</h3>
+<div class="outline-text-3" id="text-4-9">
+<ul class="org-ul">
+<li>No more accidental transitive includes</li>
+<li>If compiler knows where definition is, it may tell you what to import</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-nil">pika/libs/pika/threading/include/pika/threading/thread.hpp:40:23: error: declaration of 'function' must be imported from module 'pika.functional' before it is required
+   40 |         util::detail::function&lt;void(std::exception_ptr const&amp; e)&gt;;
+      |                       ^
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge828d11" class="outline-3">
+<h3 id="orge828d11"><span class="section-number-3">4.10.</span> import std</h3>
+<div class="outline-text-3" id="text-4-10">
+<ul class="org-ul">
+<li><code>import std</code> and <code>import std.compat</code> added in C++23
+<ul class="org-ul">
+<li><code>std.compat</code>: <i>The named module std.compat exports the same declarations as the named module std, and additionally exports declarations in the global namespace corresponding to the declarations in namespace std that are provided by the C++ headers for C library facilities</i></li>
+</ul></li>
+<li>Likely to be backported to C++20 mode by all major compiler vendors (<a href="https://github.com/microsoft/STL/issues/3945">https://github.com/microsoft/STL/issues/3945</a>)</li>
+<li>CMake support requires 3.30, clang and libc++; did not test
+<ul class="org-ul">
+<li>first clang (nixos) had broken libc++ installation?</li>
+<li>second clang (spack) was missing <code>clang-scan-deps</code> (used by CMake to discover module dependencies)</li>
+</ul></li>
+<li>Used a modified version of <a href="https://github.com/DanielaE/std.module">https://github.com/DanielaE/std.module</a> to include all dependencies through a module <i>for testing</i>
+<ul class="org-ul">
+<li>Don&rsquo;t do this at home: pika effectively takes ownership of all its dependencies, making life difficult for dependees of pika</li>
+<li>Equivalent to vendoring dependencies, which is generally also a bad idea</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org3e8a55b" class="outline-3">
+<h3 id="org3e8a55b"><span class="section-number-3">4.11.</span> ADL with modules</h3>
+<div class="outline-text-3" id="text-4-11">
+<ul class="org-ul">
+<li>Big topic of <i>reachability</i></li>
+<li>Example from <a href="https://vector-of-bool.github.io/2019/10/07/modules-3.html">https://vector-of-bool.github.io/2019/10/07/modules-3.html</a></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">foo.hpp</span>
+<span style="color: #3E2723; font-weight: bold;">template</span> <span style="color: #3E2723;">&lt;</span><span style="color: #3E2723; font-weight: bold;">typename</span> <span style="color: #0D47A1;">T</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">do_something</span><span style="color: #3E2723;">(</span>T val<span style="color: #3E2723;">)</span> <span style="color: #3E2723;">{</span>
+    <span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">...</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span>;
+<span style="color: #757575;">#include</span> <span style="color: #1A237E;">"foo.hpp"</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">acme</span>;
+
+<span style="color: #3E2723; font-weight: bold;">template</span> <span style="color: #3E2723;">&lt;</span><span style="color: #3E2723; font-weight: bold;">typename</span> <span style="color: #0D47A1;">T</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">frombulate</span><span style="color: #3E2723;">(</span>T item<span style="color: #3E2723;">)</span> <span style="color: #3E2723;">{</span>
+    do_something<span style="color: #000000;">(</span>item<span style="color: #000000;">)</span>;
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">acme</span>;
+
+<span style="color: #0D47A1;">int</span> <span style="color: #000000; font-weight: bold;">main</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span>
+    frombulate<span style="color: #000000;">(</span><span style="color: #1A237E;">42</span><span style="color: #000000;">)</span>; <span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">ERROR: No matching overload of `do_something`!</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org01334f4" class="outline-3">
+<h3 id="org01334f4"><span class="section-number-3">4.12.</span> ADL with modules</h3>
+<div class="outline-text-3" id="text-4-12">
+<ul class="org-ul">
+<li>Big topic of <i>reachability</i></li>
+<li>Example from <a href="https://vector-of-bool.github.io/2019/10/07/modules-3.html">https://vector-of-bool.github.io/2019/10/07/modules-3.html</a></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">foo.hpp</span>
+<span style="color: #3E2723; font-weight: bold;">template</span> <span style="color: #3E2723;">&lt;</span><span style="color: #3E2723; font-weight: bold;">typename</span> <span style="color: #0D47A1;">T</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">do_something</span><span style="color: #3E2723;">(</span>T val<span style="color: #3E2723;">)</span> <span style="color: #3E2723;">{</span>
+    <span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">...</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span>;
+<span style="color: #757575;">#include</span> <span style="color: #1A237E;">"foo.hpp"</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">acme</span>;
+
+<span style="color: #3E2723; font-weight: bold;">template</span> <span style="color: #3E2723;">&lt;</span><span style="color: #3E2723; font-weight: bold;">typename</span> <span style="color: #0D47A1;">T</span><span style="color: #3E2723;">&gt;</span>
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">frombulate</span><span style="color: #3E2723;">(</span>T item<span style="color: #3E2723;">)</span> <span style="color: #3E2723;">{</span>
+    do_something<span style="color: #000000;">(</span>item<span style="color: #000000;">)</span>;
+<span style="color: #3E2723;">}</span>
+
+<span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #0D47A1;">void</span> <span style="color: #000000; font-weight: bold;">use_it</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span>
+    frombulate<span style="color: #000000;">(</span><span style="color: #757575;">true</span><span style="color: #000000;">)</span>;
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">acme</span>;
+
+<span style="color: #0D47A1;">int</span> <span style="color: #000000; font-weight: bold;">main</span><span style="color: #3E2723;">()</span> <span style="color: #3E2723;">{</span>
+    frombulate<span style="color: #000000;">(</span><span style="color: #1A237E;">42</span><span style="color: #000000;">)</span>; <span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">ERROR: No matching overload of `do_something`!</span>
+<span style="color: #3E2723;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org89edf22" class="outline-3">
+<h3 id="org89edf22"><span class="section-number-3">4.13.</span> Unexplored</h3>
+<div class="outline-text-3" id="text-4-13">
+<ul class="org-ul">
+<li>Header units
+<ul class="org-ul">
+<li>Should make headers importable as separate translation units</li>
+<li>Act similarly to precompiled headers, but built into the language</li>
+<li>Macros are usable through header units</li>
+<li>Not all headers can be imported</li>
+</ul></li>
+<li>Built Module Interface (BMI)
+<ul class="org-ul">
+<li>Installing and consuming libraries with modules</li>
+</ul></li>
+<li>clang/GCC compatibility</li>
+<li>CUDA/HIP compatibility</li>
+<li>etc.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb18a204" class="outline-2">
+<h2 id="orgb18a204"><span class="section-number-2">5.</span> Summary</h2>
+<div class="outline-text-2" id="text-5">
+<ul class="org-ul">
+<li>Modules are
+<ul class="org-ul">
+<li>Useful</li>
+<li>Immature</li>
+<li>Complex, when used in the real world</li>
+</ul></li>
+<li><b>Should you use modules? Yes, with reservations</b>
+<ul class="org-ul">
+<li>Executables where noone depends on you</li>
+<li>Then again, someone has to start using modules in libraries</li>
+<li>No CUDA/HIP? clang to the rescue?</li>
+<li>Otherwise, wait for better times</li>
+</ul></li>
+</ul>
+</div>
+<div id="outline-container-orgaf7d174" class="outline-3">
+<h3 id="orgaf7d174"><span class="section-number-3">5.1.</span> Resources</h3>
+<div class="outline-text-3" id="text-5-1">
+<ul class="org-ul">
+<li><a href="https://eel.is/c++draft/module">https://eel.is/c++draft/module</a></li>
+<li><a href="https://en.cppreference.com/w/cpp/language/modules">https://en.cppreference.com/w/cpp/language/modules</a></li>
+<li><a href="https://clang.llvm.org/docs/StandardCPlusPlusModules.html">https://clang.llvm.org/docs/StandardCPlusPlusModules.html</a></li>
+<li><a href="https://gcc.gnu.org/wiki/cxx-modules">https://gcc.gnu.org/wiki/cxx-modules</a></li>
+<li><a href="https://www.youtube.com/watch?v=iMNML689qlU">https://www.youtube.com/watch?v=iMNML689qlU</a></li>
+<li><a href="https://vector-of-bool.github.io/2019/03/10/modules-1.html">https://vector-of-bool.github.io/2019/03/10/modules-1.html</a></li>
+<li><a href="https://vector-of-bool.github.io/2019/03/31/modules-2.html">https://vector-of-bool.github.io/2019/03/31/modules-2.html</a></li>
+<li><a href="https://vector-of-bool.github.io/2019/10/07/modules-3.html">https://vector-of-bool.github.io/2019/10/07/modules-3.html</a></li>
+<li><a href="https://learn.microsoft.com/en-us/cpp/cpp/modules-cpp?view=msvc-170">https://learn.microsoft.com/en-us/cpp/cpp/modules-cpp?view=msvc-170</a></li>
+<li><a href="https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/">https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/</a></li>
+<li><a href="https://cmake.org/cmake/help/latest/manual/cmake-cxxmodules.7.html">https://cmake.org/cmake/help/latest/manual/cmake-cxxmodules.7.html</a></li>
+<li><a href="https://www.kitware.com/import-cmake-c20-modules/">https://www.kitware.com/import-cmake-c20-modules/</a></li>
+<li><a href="https://www.kitware.com/import-std-in-cmake-3-30/">https://www.kitware.com/import-std-in-cmake-3-30/</a></li>
+<li><a href="https://wg21.link/p1441">https://wg21.link/p1441</a></li>
+<li><a href="https://wg21.link/p1689">https://wg21.link/p1689</a></li>
+<li><a href="https://wg21.link/p1788">https://wg21.link/p1788</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2024-08-22 Thu 11:24</p>
+</div>
+</body>
+</html>
