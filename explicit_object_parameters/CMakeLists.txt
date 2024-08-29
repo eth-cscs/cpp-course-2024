@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if (${CPP_COURSE_BUILD_SLIDES})
-    include(cmake/Marp.cmake)
+    include(../slides-support/Marp.cmake)
 endif()
 
 include(CTest)

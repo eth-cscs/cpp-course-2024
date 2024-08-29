@@ -12,7 +12,7 @@ function(add_marp_slides name source)
                 ${MARP_EXECUTABLE}
                 --allow-local-files
                 --html
-                --theme ${CMAKE_SOURCE_DIR}/slides-support/themes/cscs.css
+                --theme ${CMAKE_SOURCE_DIR}/../slides-support/themes/cscs.css
                 --pdf
                 -o ${output_pdf}
                 ${source}
@@ -28,7 +28,7 @@ function(add_marp_slides name source)
             ${MARP_EXECUTABLE}
             --allow-local-files
             --html
-            --theme ${CMAKE_SOURCE_DIR}/slides-support/themes/cscs.css
+            --theme ${CMAKE_SOURCE_DIR}/../slides-support/themes/cscs.css
             -o ${output_html}
             ${source}
         MAIN_DEPENDENCY ${source}
