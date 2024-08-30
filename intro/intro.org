@@ -1,0 +1,52 @@
+#+Title: 2024 CSCS C++ course: intro
+
+#+OPTIONS: reveal_center:t reveal_progress:t reveal_history:t reveal_control:t
+#+OPTIONS: reveal_rolling_links:t reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: reveal_width:1600 reveal_height:1200
+#+OPTIONS: reveal_single_file:t
+#+OPTIONS: reveal_rolling_links:nil
+#+OPTIONS: toc:nil
+#+REVEAL_MARGIN: 0.1
+#+REVEAL_MIN_SCALE: 1.0
+#+REVEAL_MAX_SCALE: 2.5
+#+REVEAL_TRANS: none
+#+REVEAL_HLEVEL: 2
+#+REVEAL_THEME: night
+
+* Expectations and wishes
+- What do you expect to learn during the course?
+- Feel free to add questions/topics during the course
+
+[[./mentimeter_qr_code.png]]
+
+[[https://menti.com/alyx7v2xfy84]] or https://menti.com with code 3954 0705
+
+* Overview
+- C++ evolving rapidly, but we may not see much of it in practice because some compilers keep us on C++17 or 20 at best
+- We'll look at selected C++20/23/26 features
+- Could not cover everything requested in the survey
+  - Attempt to organize smaller, more frequent opportunities talk about C++
+- Encourage C++ presentations, design discussion, reviews between teams
+- Thank you to Alberto, Auriane, Christopher, Fabian, Hannes, Ioannis, Raffaele
+
+* Slides
+
+[[https://github.com/eth-cscs/cpp-course-2024]]
+
+* Schedule
+- Day 1 (September 3rd)
+  - *~std::mdspan~* (Hannes)
+  - *stdBLAS* (Raffaele)
+  - 12:00-13:00: *Lunch*
+  - *concepts* (Alberto)
+  - ~15:00: *Break*
+  - *explicit object parameters* (Fabian)
+  - *modules* (Mikael)
+  - 17:00: *End*
+
+- Day 2 (October 1st, only online)
+  - *~std::simd~* (Ioannis)
+  - *debugging/profiling tools* (Ioannis)
+  - 12:00-13:00: *Lunch*
+  - *miscellaneous*
+  - *topics from the participants*
