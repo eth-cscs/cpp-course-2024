@@ -60,7 +60,7 @@ template<
 - *TriviallyCopyable*\*: can be used in host/device interfaces
 - allows different layouts
 
-\* under some costraints
+\* under some constraints
 
 ---
 
@@ -80,7 +80,7 @@ auto v_span = std::mdspan(v.data(), std::extents{ 10, 10 });
 ```
 
 - `T` is the element type (`my_mdspan::element_type`): `float`
-- `Extents` describes number of dimensions and there sizes (required to be spezialization of `std::extents`)
+- `Extents` describes number of dimensions and their sizes (required to be specialization of `std::extents`)
 - `LayoutPolicy` describes memory layout (`my_mdspan::layout_type`): default `std::layout_right` (C-layout)
 - `AccessorPolicy` allows customization how we access the data (`my_mdspan::accessor_type`):
   think `std::default_accessor<T>` does pointer dereference of `T*`
