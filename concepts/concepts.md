@@ -1406,7 +1406,7 @@ Concept auto & const name
 ```
 
 ```cpp
-Concept auto * const res6 = &val;
+Concept auto * const name = &val;
 ```
 
 </div>
@@ -1446,7 +1446,7 @@ Concept auto * const res6 = &val;
 ```
 
 ```cpp
-✅ Concept auto * const res6
+✅ Concept auto * const name
 ```
 
 </div>
