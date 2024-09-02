@@ -68,7 +68,7 @@ cholesky_factor(InOutMat A, Triangle t)
     //                   A21, A22],
     // where A21 is the transpose of A12.
     const size_type n1 = n / 2;
-    const size_type n2 = n - n1;
+    // n2 = n - n1;
     auto A11 = submdspan(A, pair{0, n1}, pair{0, n1});
     auto A22 = submdspan(A, pair{n1, n}, pair{n1, n});
 
