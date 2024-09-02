@@ -417,7 +417,7 @@ auto submdspan(mdspan<T,E,L,A> x, SliceArgs ... args);
     [[no_unique_address]] StrideType stride{};
   };
   ```
-  Note: Unlike Python, Fortran (...) doesn't use `stop` but `extent`.
+  Note: Unlike Python, Fortran (...), doesn't use `stop`, but `extent`.
 
 ---
 
