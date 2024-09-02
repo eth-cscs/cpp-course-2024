@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(cpp_course_2024 CXX)
+project(cpp_course_2024 CXX CUDA)
 
 #------------------------------------------------------------------------------
 # Setup Output directories
@@ -19,7 +19,6 @@ option(CPP_COURSE_BUILD_SLIDES "Whether to build slides." ON)
 option(CPP_COURSE_BUILD_SLIDES_PDF "Whether to build slides." ON)
 option(CPP_COURSE_BUILD_CODE "Whether to build code samples." ON)
 
-set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -31,7 +30,7 @@ include(CTest)
 
 
 if (${CPP_COURSE_BUILD_SLIDES})
-    add_marp_slides(mdspan mdspan.md)
+    add_marp_slides(mdspan_slides mdspan.md)
 endif()
 
 if (${CPP_COURSE_BUILD_CODE})
@@ -43,9 +42,22 @@ if (${CPP_COURSE_BUILD_CODE})
     )
     FetchContent_MakeAvailable(mdspan)
 
-    add_executable(03_02b_mdspan code/mdspan.cpp)
-    target_link_libraries(03_02b_mdspan mdspan)
-    target_compile_features(03_02b_mdspan PRIVATE cxx_std_23)
+    add_executable(mdspan_example code/mdspan.cpp)
+    target_link_libraries(mdspan_example mdspan)
+    target_compile_features(mdspan_example PRIVATE cxx_std_23)
 
-    add_test(NAME 03_02b_mdspan COMMAND 03_02b_mdspan)
+    add_test(NAME mdspan_example COMMAND mdspan_example)
+
+
+    add_executable(mdarray_example code/mdarray.cpp)
+    target_link_libraries(mdarray_example mdspan)
+    target_compile_features(mdarray_example PRIVATE cxx_std_23)
+
+    add_test(NAME mdarray_example COMMAND mdarray_example)
+    
+    add_executable(submdspan_example code/submdspan.cpp)
+    target_link_libraries(submdspan_example mdspan)
+    target_compile_features(submdspan_example PRIVATE cxx_std_23)
+
+    add_test(NAME submdspan_example COMMAND submdspan_example)
 endif()

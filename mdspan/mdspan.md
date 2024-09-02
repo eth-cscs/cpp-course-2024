@@ -34,7 +34,7 @@ How to interface between libraries?
 - Worst case: concrete class
 
 
-**`md::span` is**
+**`std::mdspan` is**
 - **a non-owning multi-dimensional array view**
 - **meant to be used in interfaces**
 
@@ -44,7 +44,7 @@ How to interface between libraries?
 
 `std::mdspan ` is a non-owning multi-dimensional array view
 
-- since C++23, see https://wg21.link/p0009 and  https://eel.is/c++draft/views#multidim
+- since C++23, see https://wg21.link/p0009 \* and https://eel.is/c++draft/views#multidim
 ![](md_span_implementation_status_2024.png)
 - think of *pointer* and *metadata* (how to interpret the pointed-to memory)
 
@@ -57,10 +57,11 @@ template<
 > class mdspan;
 ```
 
-- *TriviallyCopyable*\*: can be used in host/device interfaces
+- *TriviallyCopyable*\**: can be used in host/device interfaces
 - allows different layouts
 
-\* under some constraints
+\* and various additions
+\** under some constraints
 
 ---
 
@@ -76,7 +77,7 @@ template<
 ```
 ```c++
 std::vector<float> v(100);
-auto v_span = std::mdspan(v.data(), std::extents{ 10, 10 });
+auto my_mdspan = std::mdspan(v.data(), std::extents{ 10, 10 });
 ```
 
 - `T` is the element type (`my_mdspan::element_type`): `float`
@@ -86,7 +87,7 @@ auto v_span = std::mdspan(v.data(), std::extents{ 10, 10 });
   think `std::default_accessor<T>` does pointer dereference of `T*`
 
 ```c++
-v_span[2, 3] = 42.;
+my_mdspan[2, 3] = 42.;
 ```
 ---
 
@@ -94,8 +95,6 @@ v_span[2, 3] = 42.;
 
 - can describe run-time and compile-time extents
 - compile-time extents are helpful for optimizations (explicit by library implementor or implicit by compiler)
-
-- very easy (thanks to CTAD): `std::extents{ 10, 10 }`
 
 ```c++
 template< class IndexType, std::size_t... Extents >
@@ -199,7 +198,40 @@ std::for_each(std::execution::par_unseq,
 
 ---
 
+# Outlook: Example LayoutPolicy std::linalg::transposed
+
+(illustrative example, not standard conforming)
+
+```c++
+template <class Layout> struct transposed_layout {
+  template <class Extents>
+  struct mapping : public Layout::template mapping<impl::transposed_extents_t<Extents>> {
+    using _base_mapping = typename Layout::template mapping<impl::transposed_extents_t<Extents>>;
+    using extents_type = Extents;
+
+    template <class I0, class I1>
+    constexpr _base_mapping::index_type operator()(I0 i0, I1 i1) const noexcept{
+      return _base_mapping::operator()(i1, i0);
+    }
+
+    constexpr extents_type extents() const noexcept { // std requires const& return
+      return impl::transpose_extents(_base_mapping::extents());
+    }
+  };
+};
+
+template <class T, class E, class L, class A, class TE = /*...*/, class TL = transposed_layout<L>>
+auto transposed(std::mdspan<T, E, L, A> m) {
+  return std::mdspan<T, TE, TL, A>{
+      m.data_handle(), {m.mapping()}, m.accessor()};
+}
+```
+
+---
+
 # AccessorPolicy
+
+- customization of how to access the data: e.g. `restrict`, atomic access, ...
 
 ## Example
 
@@ -258,17 +290,136 @@ void test_host_device_protector() {
 
 ---
 
-# Status of multi-dimensional C++
+# Outlook: Example std::linalg::scaled
+
+```c++
+template <class WrappedAccessor, class ScaleType> struct scaled_accessor {
+  ScaleType factor;
+  WrappedAccessor a;
+  using element_type = std::add_const_t<
+      decltype(std::declval<typename WrappedAccessor::element_type>() *
+               factor)>;
+  using data_handle_type = WrappedAccessor::data_handle_type;
+  using reference = std::remove_const_t<element_type>;
+  using offset_policy = WrappedAccessor::offset_policy;
+
+  constexpr data_handle_type offset(data_handle_type p,
+                                    size_t i) const noexcept {
+    return p + i;
+  }
+  constexpr reference access(data_handle_type p, size_t i) const noexcept {
+    return p[i] * factor;
+  }
+};
+
+template <class T, class E, class L, class A, class U,
+          class SA = scaled_accessor<A, U>>
+auto scaled(U factor, std::mdspan<T, E, L, A> m) {
+  return std::mdspan<typename SA::element_type, E, L, SA>{
+      m.data_handle(), m.mapping(), SA{factor, m.accessor()}};
+}
+```
+
+---
+
+# Accessing data in mdspan
+
+```c++
+my_mdspan[1,2,3];
+```
+has the *effect* of
+```c++
+template<class... OtherSizeTypes>
+constexpr reference operator[](OtherSizeTypes... indices) {
+    return acc_.access(ptr_,map_(static_cast<size_type>(std::move(indices))...));
+}
+```
+
+---
+
+# 18 revisions, several extensions and not done
+
+- since the first proposal in 2015, C++ changed, e.g. CTAD
+
+In P0009:
+```c++
+mdspan<double, dynamic_extent, dynamic_extent> a(data, 64, 64);
+void f(std::mdspan<float, std::extents<std::dynamic_extent, std::dynamic_extent, std::dynamic_extent>> a);
+```
+with P2299:
+```c++
+mdspan a(data, 64, 64);
+void f(std::mdspan<float, std::dextents<3>> a);
+```
+but P2553:
+```c++
+void f(mdspan<float, std::dextents<std::size_t, 3>> a);
+```
+so P2389 (C++26):
+```c++
+void f(mdspan<float, std::dims<3>> a);
+```
+
+
+---
+
+# Status of multi-dimensional C++23
 
 ✅ accessing multi-dimensional data (mdspan)
 ❌ allocating multi-dimensional data
 ❌ iterating multi-dimensional data / multi-dimensional algorithms (see \*)
 
 In C++26 we will get:
-- very likely: `std::submdspan`
+- `std::submdspan`
 - likely: `std::mdarray`
 
 \* [Multidimensional C++, Bryce A. Lelbach at CppNorth 2022](https://youtu.be/aFCLmQEkPUw?si=4LI8eo5ZvBLEjDxq) 
+
+---
+
+# std::submdspan() - C++26 (P2630)
+
+```c++
+template<class T, class E, class L, class A,
+         class ... SliceArgs>
+auto submdspan(mdspan<T,E,L,A> x, SliceArgs ... args);
+```
+
+- similar to slicing in NumPy, Fortran, etc,
+- but slices are defined by `start`, `extent` and `step`
+
+## Examples:
+```c++
+auto y = submdspan(x, strided_slice{.offset=0, .extent=10, .stride=3});
+```
+
+
+
+---
+# std::submdspan Implementation
+
+```c++
+template<class T, class E, class L, class A,
+         class ... SliceArgs>
+auto submdspan(const mdspan<T,E,L,A>& src, SliceArgs ... args) {
+  auto sub_map_offset = submdspan_mapping(src.mapping(), args...);
+  return mdspan(src.accessor().offset(src.data(), sub_map_offset.offset),
+                sub_map_offset.mapping,
+                AccessorPolicy::offset_policy(src.accessor()));
+}
+```
+
+## Customization point
+
+```c++
+template<class Mapping, class ... SliceArgs>
+auto submdspan_mapping(const Mapping&, SliceArgs...) { /* ... */ }
+```
+
+- For custom layouts users can provide their own `submdspan_mapping`, which will be found via ADL.
+- There is no default implementation.
+
+<!--
 
 ---
 
@@ -284,7 +435,7 @@ struct my_mdarray {
     my_mdarray(std::convertible_to<int> auto... sizes) : data_((sizes * ...)), sizes_{ sizes... } {
     }
 
-    std::mdspan<T, std::dextents<int, N>> mdspan() {
+    std::mdspan<T, std::dextents<int, N>> to_mdspan() {
         return { data_.data(), std::dextents<int, N>{ sizes_ } };
     }
 
@@ -295,8 +446,64 @@ struct my_mdarray {
 ```
 
 
-
 \* std::mdarray is proposed in https://wg21.link/p1684
+-->
+
+<!--
+
+---
+
+# Extensions to P0009
+
+(TODO maybe move into other slides)
+
+## P2642 - Padded mdspan layouts (in C++26)
+## P2553 - Make mdspan size_type controllable (in C++23)
+## P3029 - Better mdspan's CTAD (in C++26)
+## P2630 - std::submdspan() (in C++26)
+
+-->
+
+---
+
+# std::mdarray (P1684) for C++26
+
+> One major goal of the design for `mdarray` is to parallel the design of `mdspan` as much as possible, with the goals of reducing cognitive load for users already familiar with `mdspan` and of incorporating the lessons learned from over a decade of experience with P0009 [...]. (P1684)
+
+```c++
+mdarray<double, dextents<int, 2>> matrix(N,M);
+```
+
+```c++
+template<class ElementType,
+         class Extents,
+         class LayoutPolicy = layout_right,
+         class Container = vector<ElementType>>
+  class mdarray;
+```
+
+Main differences owning vs reference semantics and additional overloads.
+
+---
+
+# std::mdarray - Examples
+
+```c++
+std::experimental::mdarray<double, std::dextents<int, 2>> b{std::dextents<int, 2>{2, 21}, v};
+```
+
+```c++
+std::experimental::mdarray<double, std::dextents<int, 2>> c{std::dextents<int, 2>{2, 21}, std::move(v)};
+```
+
+```c++
+std::experimental::mdarray<int, std::dextents<int, 2>, std::layout_right,std::vector<int, FancyAllocator<int>>>
+      d{std::dextents<int, 2>{2, 21}, FancyAllocator<int>{}};
+```
+
+and ~20 more overloads.
+
+CTAD?
 
 ---
 # Questions?
@@ -304,3 +511,14 @@ struct my_mdarray {
 <!-- _paginate: skip  -->
 <!-- _class: titlecover -->
 <!-- _footer: "" -->
+---
+# Quiz
+
+- For a layout policy which is not `std::layout_right` or `std::layout_left`, can we optimize stride-1 access? Under which constraints?
+- Is a wrap-around semantics for a custom accessor possibly? E.g.
+  ```c++
+  std::vector<int> data{0, 1, 2, 3, 4};
+  auto s = std::mdspan<...>(data.data(), ...);
+  assert(s[5] == 0);
+  assert(s[6] == 1);
+  ```
