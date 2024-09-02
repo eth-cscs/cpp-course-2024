@@ -392,19 +392,6 @@ void f(mdspan<float, std::dims<3>> a);
 ```
 
 
----
-
-# Status of multi-dimensional C++23
-
-✅ accessing multi-dimensional data (mdspan)
-❌ allocating multi-dimensional data
-❌ iterating multi-dimensional data / multi-dimensional algorithms (see \*)
-
-In C++26 we will get:
-- `std::submdspan`
-- likely: `std::mdarray`
-
-\* [Multidimensional C++, Bryce A. Lelbach at CppNorth 2022](https://youtu.be/aFCLmQEkPUw?si=4LI8eo5ZvBLEjDxq) 
 
 ---
 
@@ -637,13 +624,16 @@ template<class ElementType,
   class mdarray;
 ```
 
-Main differences owning vs reference semantics and additional overloads.
+Main difference: owning vs reference semantics and additional overloads.
 
 ---
 
-# std::mdarray - Examples
+# std::mdarray
+
+## Examples
 
 ```c++
+std::vector<double> v(42);
 std::experimental::mdarray<double, std::dextents<int, 2>> b{std::dextents<int, 2>{2, 21}, v};
 ```
 
@@ -658,15 +648,31 @@ std::experimental::mdarray<int, std::dextents<int, 2>, std::layout_right,std::ve
 
 and ~20 more overloads.
 
-CTAD?
+## Recent discussion
+
+**`mdarray` design questions and answers** (2024-05-21, http://wg21.link/p3308)
 
 ---
+
+# Status of multi-dimensional C++
+
+✅ accessing multi-dimensional data (mdspan)
+🔶 allocating multi-dimensional data (mdarray)
+❌ iterating multi-dimensional data / multi-dimensional algorithms (see e.g. \*)
+
+
+\* [Multidimensional C++, Bryce A. Lelbach at CppNorth 2022](https://youtu.be/aFCLmQEkPUw?si=4LI8eo5ZvBLEjDxq) 
+
+---
+
 # Questions?
 ![bg cover](../slides-support/common/title-bg2.png)
 <!-- _paginate: skip  -->
 <!-- _class: titlecover -->
 <!-- _footer: "" -->
+
 ---
+
 # Quiz
 
 - For a layout policy which is not `std::layout_right` or `std::layout_left`, can we optimize stride-1 access? Under which constraints?
