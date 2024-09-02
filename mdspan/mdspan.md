@@ -416,15 +416,139 @@ template<class T, class E, class L, class A,
 auto submdspan(mdspan<T,E,L,A> x, SliceArgs ... args);
 ```
 
-- similar to slicing in NumPy, Fortran, etc,
-- but slices are defined by `start`, `extent` and `step`
+### A *slice specifier* can be
+- an integral value
+- something convertible to `tuple<mdspan::index_type, mdspan::index_type>` denoting begin to end range (Python: `start:stop`)
+- instance of `full_extent_t` (Python: `:`)
+- an instance of
+  ```c++
+  template<class OffsetType, class ExtentType, class StrideType>
+  struct strided_slice {
+    // ...
+    [[no_unique_address]] OffsetType offset{};
+    [[no_unique_address]] ExtentType extent{};
+    [[no_unique_address]] StrideType stride{};
+  };
+  ```
+  Note: Unlike Python, Fortran (...) doesn't use `stop` but `extent`.
 
-## Examples:
+---
+
+# std::submdspan
+
+## Examples
+
 ```c++
-auto y = submdspan(x, strided_slice{.offset=0, .extent=10, .stride=3});
+// m = std::mdspan(..., std::extents<int, std::dynamic_extent, 10>{8}) with m[i, j] == i * 10 + j
+auto s1 = std::submdspan(m, std::tuple(1, 3), std::full_extent);
+assert(s1.extent(0) == ?);
+assert((s1[0, 0] == ?));
+assert((s1[1, 1] == ?));
+```
+
+```c++
+auto s2 = std::submdspan(m, std::tuple(1, 3), 5);
+assert(s2[0] == ?);
+assert(s2[1] == ?);
+```
+
+```c++
+auto s3 = std::submdspan(m, 4, 2);
+static_assert(decltype(s3)::rank() == ?);
+assert(s3[] == ?);
+```
+
+```c++
+auto s4 = std::submdspan(m, std::tuple(std::integral_constant<int, 1>{}, std::integral_constant<int, 3>{}), std::tuple(3, 5));
+static_assert(decltype(s4)::rank() == ?);
+static_assert(decltype(s4)::static_extent(0) == ?);
+assert((s4[0, 0] == ?));
+assert((s4[1, 1] == ?));
+```
+
+---
+
+# std::submdspan
+
+## Examples
+
+```c++
+// m = std::mdspan(..., std::extents<int, std::dynamic_extent, 10>{8}) with m[i, j] == i * 10 + j
+auto s1 = std::submdspan(m, std::tuple(1, 3), std::full_extent);
+assert(s1.extent(0) == 2);
+assert((s1[0, 0] == 10));
+assert((s1[1, 1] == 21));
+```
+
+```c++
+auto s2 = std::submdspan(m, std::tuple(1, 3), 5);
+assert(s2[0] == 15);
+assert(s2[1] == 25);
+```
+
+```c++
+auto s3 = std::submdspan(m, 4, 2);
+static_assert(decltype(s3)::rank() == 0);
+assert(s3[] == 42);
+```
+
+```c++
+auto s4 = std::submdspan(m, std::tuple(std::integral_constant<int, 1>{}, std::integral_constant<int, 3>{}), std::tuple(3, 5));
+static_assert(decltype(s4)::rank() == 2);
+static_assert(decltype(s4)::static_extent(0) == 2);
+assert((s4[0, 0] == 13));
+assert((s4[1, 1] == 24));
+```
+
+---
+# std::submdspan
+
+## Examples
+
+
+```c++
+auto s5 = std::submdspan(
+      m, 0, std::strided_slice{.offset = 2, .extent = 4, .stride = 2});
+static_assert(decltype(s5)::rank() == ?);
+static_assert(decltype(s5)::static_extent(0) == ?);
+assert(s5.extent(0) == ?);
 ```
 
 
+```c++
+auto s6 = std::submdspan(
+    m, 0,
+    std::strided_slice{.offset = 2,
+                        .extent = std::integral_constant<int, 4>{},
+                        .stride = std::integral_constant<int, 1>{}});
+static_assert(decltype(s6)::rank() == ?);
+static_assert(decltype(s6)::static_extent(0) == ?);
+```
+
+---
+# std::submdspan
+
+## Examples
+
+
+```c++
+auto s5 = std::submdspan(
+      m, 0, std::strided_slice{.offset = 2, .extent = 4, .stride = 2});
+static_assert(decltype(s5)::rank() == 1);
+static_assert(decltype(s5)::static_extent(0) == std::dynamic_extent);
+assert(s5.extent(0) == 2);
+```
+
+
+```c++
+auto s6 = std::submdspan(
+    m, 0,
+    std::strided_slice{.offset = 2,
+                        .extent = std::integral_constant<int, 4>{},
+                        .stride = std::integral_constant<int, 1>{}});
+static_assert(decltype(s6)::rank() == 1);
+static_assert(decltype(s6)::static_extent(0) == 4);
+```
 
 ---
 # std::submdspan Implementation
