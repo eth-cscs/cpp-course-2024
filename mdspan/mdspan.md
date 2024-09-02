@@ -114,6 +114,37 @@ class extents;
 
 ```c++
 auto ext1 = std::extents<int, std::dynamic_extent, 3, std::dynamic_extent, 4>{ 42, 43 };
+static_assert(decltype(ext1)::rank() == ?);
+static_assert(decltype(ext1)::rank_dynamic() == ?);
+static_assert(decltype(ext1)::static_extent(0) == ?);
+assert(ext1.extent(0) == ?);
+static_assert(decltype(ext1)::static_extent(1) == ?);
+```
+
+```c++
+auto ext2 = std::extents<std::uint8_t, 3, 4>{};
+static_assert(decltype(ext2)::static_extent(0) == ?);
+static_assert(decltype(ext2)::static_extent(1) == ?);
+```
+
+```c++
+auto ext3 = std::extents{42, 44};
+static_assert(decltype(ext3)::static_extent(0) == ?);
+assert(ext3.extent(0) == ?);
+```
+
+```c++
+auto ext4 = std::dextents<int, 3>{ 42, 43, 44 };
+```
+
+---
+
+# std::extents
+
+## Examples
+
+```c++
+auto ext1 = std::extents<int, std::dynamic_extent, 3, std::dynamic_extent, 4>{ 42, 43 };
 static_assert(decltype(ext1)::rank() == 4);
 static_assert(decltype(ext1)::rank_dynamic() == 2);
 static_assert(decltype(ext1)::static_extent(0) == std::dynamic_extent);
@@ -128,8 +159,8 @@ static_assert(decltype(ext2)::static_extent(1) == 4);
 ```
 
 ```c++
-auto ext3 = std::extents{ 42, 44 };
-static_assert(decltype(ext3)::static_extent(42) == std::dynamic_extent);
+auto ext3 = std::extents{42, 44};
+static_assert(decltype(ext3)::static_extent(0) == std::dynamic_extent);
 assert(ext3.extent(0) == 42);
 ```
 

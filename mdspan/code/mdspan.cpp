@@ -28,9 +28,8 @@ void extents_snippets() {
   static_assert(decltype(ext2)::static_extent(1) == 4);
 
   auto ext3 = std::extents{42, 44};
-  static_assert(decltype(ext3)::static_extent(42) == std::dynamic_extent);
+  static_assert(decltype(ext3)::static_extent(0) == std::dynamic_extent);
   assert(ext3.extent(0) == 42);
-  static_assert(std::is_same_v<std::size_t, decltype(ext3)::index_type>);
 
   auto ext4 = std::dextents<int, 3>{42, 43, 44};
 }
