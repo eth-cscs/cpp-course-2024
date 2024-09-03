@@ -310,7 +310,7 @@ struct host_device_protector {
 ```c++
 void test_host_device_protector() {
     float* dev_ptr = allocate_some_cuda_memory<float>(4);
-    auto s = std::mdspan<float, std::dextents<int, 2>, std::layout_right, host_device_protector<float, DeviceType::CPU>>{ dev_ptr, std::dextents<int, 2>{ 2, 2 } };
+    auto s = std::mdspan<float, std::dextents<int, 2>, std::layout_right, host_device_protector<float, DeviceType::GPU>>{ dev_ptr, std::dextents<int, 2>{ 2, 2 } };
     std::cout << s[1, 2] << std::endl;
 }
 ```
