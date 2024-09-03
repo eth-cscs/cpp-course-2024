@@ -56,6 +56,22 @@ from ["Concepts: The Future of Generic Programming"](https://wg21.link/p0557) in
 </div>
 
 ---
+<!-- _class: lead -->
+# Concepts
+
+<div class="hcenter">
+<cite>
+
+“Concepts” is a foundational feature that in the ideal world would have been present in the very first version of templates and the basis for all use.
+
+ (Bjarne Stroustrup in 2017)
+
+</cite>
+</div>
+
+---
+<!-- _class: lead -->
+
 # What are concepts?
 
 <div class="hcenter">
@@ -78,27 +94,13 @@ So they offer classic advantages of strongly-typed type systems:
 
 ---
 <!-- _class: lead -->
-# Concepts
-
-<div class="hcenter">
-<cite>
-
-“Concepts” is a foundational feature that in the ideal world would have been present in the very first version of templates and the basis for all use.
-
- (Bjarne Stroustrup in 2017)
-
-</cite>
-</div>
-
----
-<!-- _class: lead -->
 
 # Once upon a time...
 
 ---
 <div class="hcenter">
 
-It was early 2000s and `concept` concept was born.
+## <!-- fit --> It was early 2000s and `concept` concept was born.
 
 ...at least in C++ world, because it was not a completely new idea (e.g. Haskell already had `typeclass`es), but it needed some adaptions/extension for the C++ generic programming problems.
 
@@ -398,7 +400,7 @@ void foo(std::floating_point auto, std::floating_point auto);
 # vs
 
 ```cpp
-template <std::floating_point T> void foo(T auto, T auto);
+template <std::floating_point T> void foo(T, T);
 ```
 
 </div>
@@ -418,7 +420,7 @@ std::integral auto foo();
 # vs
 
 ```cpp
-template <std::floating_point R> R foo();
+template <std::integral R> R foo();
 ```
 
 <!-- https://godbolt.org/z/vqehcPGdn -->
@@ -432,64 +434,51 @@ template <std::floating_point R> R foo();
 ### <span>en.cppreference.com/w/cpp/concepts</span>
 
 #### (Core, Comparison, Object, Callable, Iterator, Algorithm, Ranges)
+
 ---
-# Why is it so powerful?
+# Overload
 
 <div class="hcenter">
 
-Because when a constraint is not respected, the entire function is like it does not exist for that type. It is completely removed from the overload set.
+No need for negated constraints, ad hoc arguments, ... trying to achieve mutual exclusitivity among different overloads.
 
-```cpp
+With concepts there is **partial ordering of overloads**.
 
-```
+It means it is not anymore a matter of enabling/disabling an overload from the overload set, but it is a matter of selecting the most specific one for the use-case among all available valid overloads.
 
-</div>
-
----
-
-<div class="hcenter">
-
-And it applies too class template specialization too!
-
-```cpp
-#include <concepts>
-
-template <class>
-struct X;
-
-template <std::floating_point T>
-struct X<T> : std::type_identity<float> {};
-
-template <std::integral T>
-struct X<T> : std::type_identity<int> {};
-
-template <>
-struct X<char> : std::type_identity<char> {};
-
-int main() {
-    static_assert(std::same_as<float, X<double>::type>);
-    static_assert(std::same_as<int, X<std::size_t>::type>);
-    static_assert(std::same_as<char, X<char>::type>);
-}
-```
-
-<center>
-
-https://godbolt.org/z/3cP9GMWhY
-
-</center>
-
-</div>
+And it applies also to class specialization!
 
 ---
 <!-- _backgroundColor: lightgreen -->
+<!-- _class: lead -->
+
+# EXERCISE
 
 <div class="hcenter">
 
-# TODO
-Write an overload set of functions that plays differently depending on type
-# TODO
-Or write an template class with different specializations
+Fix this snippet using concepts for class specialization.
+
+```cpp
+template <class T, class = void>
+struct X;
+
+template <class T>
+struct X<T, std::enable_if_t<std::is_integral_v<T>>> {
+    static constexpr auto value = "integral";
+};
+
+template <class T>
+struct X<T, std::enable_if_t<std::unsigned_integral<T>>> {
+    static constexpr auto value = "unsigned";
+};
+
+int main() {
+    static_assert(X<int>::value == "integral");
+    static_assert(X<unsigned int>::value == "unsigned");
+}
+```
+
+**SOLUTION** https://godbolt.org/z/P4cG3Yh9W
 
 </div>
 
@@ -529,6 +518,14 @@ static_assert(not std::is_floating_point_v<int>);
 </div>
 
 ---
+<!-- _backgroundColor: lightgreen -->
+<!-- _class: lead -->
+
+# Quick playground or continue?
+
+</div>
+
+---
 <!-- _class: lead -->
 
 # Let's introduce new keywords!
@@ -538,9 +535,7 @@ static_assert(not std::is_floating_point_v<int>);
 
 <div class="hcenter">
 
-Till now we used concepts without using any new keyword.
-
-Actually there are more ways to express the same constraint using the `requires` keyword.
+Till now we used concepts without using any new keyword. Declaring "constrained type placeholder" is not the only way to declare constraints for a type. Actually there are two other ways to express the same constraint using the `requires` keyword.
 
 **Constraining the template**
 
@@ -757,6 +752,7 @@ requires std::floating_point<T>;
 </div>
 
 ---
+<!-- _class: lead -->
 <!-- _backgroundColor: lightblue -->
 
 # QUIZ TIME
@@ -787,11 +783,7 @@ FLOATING
 FLOATING
 ```
 
-<center>
-
-https://godbolt.org/z/qWbadfjh1
-
-</center>
+**SOLUTION** https://godbolt.org/z/qWbadfjh1
 
 </div>
 
@@ -964,7 +956,7 @@ _simple, type, compound, nested, ..._
 
 2. What does it mean to be valid for that type of requirement?
    - "it builds"
-"it is true"
+   - "it is true"
 
 3. What is it technically checking?
 _"If I have `X t` and I pass it to the lambda function..."_
@@ -997,6 +989,7 @@ _"If it builds, `X` has to be ..."_
 </div>
 
 ---
+<!-- _class: lead -->
 <!-- _backgroundColor: lightgreen -->
 
 # EXERCISE
@@ -1018,14 +1011,57 @@ Try implementing it using
 - `std::convertible_from` on each argument
 
 
-<center>
-
 https://godbolt.org/z/E3rE4bcMq
 
-**Look at the errors in the different variants**
-(and with different compilers)
+</div>
 
-</center>
+---
+# Concepts & Partial Order
+
+<div class="hcenter">
+
+Do you remember when we talked about partial ordering of overloads?
+
+Concepts are partially ordered, which means that compiler can realise if a concept A subsumes a concept B.
+
+How can it infer that? It normalises concept to a sequence of and/or between atomic constraints, then it does the logic comparison to know if the two normalised concepts are related.
+
+There is just one pitfall: two atomic constraints are considered equivalent if and only if they are formed from the same expression at source level.
+
+</div>
+
+---
+<!-- _class: lead -->
+
+# Concepts & Partial Order
+
+<div class="hcenter">
+
+```cpp
+template <class T> concept incrementable = requires (T x) { x++; ++x; };
+template <class T> concept decrementable = requires (T x) { x--; --x; };
+
+template <class T>          constexpr auto foo() { return 1; }
+template <incrementable T>  constexpr auto foo() { return 2; }
+template <decrementable T>  constexpr auto foo() { return 3; }
+
+template <class T> requires requires (T a) { a++; ++a; a--; --a; }
+// template <class T> requires (incrementable<T> && decrementable<T>)
+constexpr auto foo() { return 3; }
+
+struct JustPlus {
+    JustPlus& operator++(int) {return *this; }
+    JustPlus& operator++() { return *this; }
+};
+
+int main() {
+    static_assert(foo<std::string>()   == 1);
+    static_assert(foo<JustPlus>()   == 2);
+    static_assert(foo<int>()        == 3); // error
+}
+```
+
+https://godbolt.org/z/j35db776W
 
 </div>
 
@@ -1036,195 +1072,146 @@ Do concepts improve error messages?
 
 ---
 
-<div class="hcenter">
-
-# <!-- fit --> Where do we start from? SFINAE errors
-
-<center>
+<!-- _class: lead -->
 
 There's an error in the code below... 🧐
 
-</center>
+<div class="hcenter">
 
 ```cpp
 #include <vector>
 #include <algorithm>
 
-struct Number {
+template <class T>
+void sort(std::vector<T>& values) {
+    std::sort(values.begin(), values.end());
+}
+
+struct Num {
+    Num(long long v) : value_(v) {}
     long long value_;
 };
 
 int main() {
-    std::vector<int> integers;
-    std::sort(integers.begin(), integers.end());
-
-    std::vector<Number> numbers;
-    std::sort(numbers.begin(), numbers.end());
+    std::vector<int> v_int{4,6,2,5}; sort(v_int);
+    std::vector<Num> v_num{4,6,2,5}; sort(v_num);
 }
 ```
 
 </div>
 
 ---
-<style scoped>
-pre {
-    color: white;
-    white-space: pre-wrap;
-    font-size: 5pt;
-}
-</style>
+<!-- _class: lead -->
 
-# GCC 13.2 - 79 lines of output
+# Where do we start from? SFINAE errors
 
-<!-- https://godbolt.org/z/34nq5K3rK -->
+<div class="hcenter">
 
-<pre style="color: black;">
-In file included from /opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algobase.h:71,
-                 from /opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/vector:62,
-                 from <source>:1:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h: In instantiation of 'constexpr bool __gnu_cxx::__ops::_Iter_less_iter::operator()(_Iterator1, _Iterator2) const [with _Iterator1 = __gnu_cxx::__normal_iterator<Number*, std::vector<Number> >; _Iterator2 = __gnu_cxx::__normal_iterator<Number*, std::vector<Number> >]':
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1819:14:   required from 'void std::__insertion_sort(_RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1859:25:   required from 'void std::__final_insertion_sort(_RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1950:31:   required from 'void std::__sort(_RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:4861:18:   required from 'void std::sort(_RAIter, _RAIter) [with _RAIter = __gnu_cxx::__normal_iterator<Number*, vector<Number> >]'
-<source>:13:14:   required from here
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:45:23: error: no match for 'operator<' (operand types are 'Number' and 'Number')
-   45 |       { return *__it1 < *__it2; }
-      |                ~~~~~~~^~~~~~~~
-In file included from /opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algobase.h:67:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1250:5: note: candidate: 'template<class _IteratorL, class _IteratorR, class _Container> bool __gnu_cxx::operator<(const __normal_iterator<_IteratorL, _Container>&, const __normal_iterator<_IteratorR, _Container>&)'
- 1250 |     operator<(const __normal_iterator<_IteratorL, _Container>& __lhs,
-      |     ^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1250:5: note:   template argument deduction/substitution failed:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:45:23: note:   'Number' is not derived from 'const __gnu_cxx::__normal_iterator<_IteratorL, _Container>'
-   45 |       { return *__it1 < *__it2; }
-      |                ~~~~~~~^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1258:5: note: candidate: 'template<class _Iterator, class _Container> bool __gnu_cxx::operator<(const __normal_iterator<_Iterator, _Container>&, const __normal_iterator<_Iterator, _Container>&)'
- 1258 |     operator<(const __normal_iterator<_Iterator, _Container>& __lhs,
-      |     ^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1258:5: note:   template argument deduction/substitution failed:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:45:23: note:   'Number' is not derived from 'const __gnu_cxx::__normal_iterator<_Iterator, _Container>'
-   45 |       { return *__it1 < *__it2; }
-      |                ~~~~~~~^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h: In instantiation of 'bool __gnu_cxx::__ops::_Val_less_iter::operator()(_Value&, _Iterator) const [with _Value = Number; _Iterator = __gnu_cxx::__normal_iterator<Number*, std::vector<Number> >]':
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1799:20:   required from 'void std::__unguarded_linear_insert(_RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Val_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1827:36:   required from 'void std::__insertion_sort(_RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1859:25:   required from 'void std::__final_insertion_sort(_RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1950:31:   required from 'void std::__sort(_RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:4861:18:   required from 'void std::sort(_RAIter, _RAIter) [with _RAIter = __gnu_cxx::__normal_iterator<Number*, vector<Number> >]'
-<source>:13:14:   required from here
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:98:22: error: no match for 'operator<' (operand types are 'Number' and 'Number')
-   98 |       { return __val < *__it; }
-      |                ~~~~~~^~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1250:5: note: candidate: 'template<class _IteratorL, class _IteratorR, class _Container> bool __gnu_cxx::operator<(const __normal_iterator<_IteratorL, _Container>&, const __normal_iterator<_IteratorR, _Container>&)'
- 1250 |     operator<(const __normal_iterator<_IteratorL, _Container>& __lhs,
-      |     ^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1250:5: note:   template argument deduction/substitution failed:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:98:22: note:   'Number' is not derived from 'const __gnu_cxx::__normal_iterator<_IteratorL, _Container>'
-   98 |       { return __val < *__it; }
-      |                ~~~~~~^~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1258:5: note: candidate: 'template<class _Iterator, class _Container> bool __gnu_cxx::operator<(const __normal_iterator<_Iterator, _Container>&, const __normal_iterator<_Iterator, _Container>&)'
- 1258 |     operator<(const __normal_iterator<_Iterator, _Container>& __lhs,
-      |     ^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1258:5: note:   template argument deduction/substitution failed:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:98:22: note:   'Number' is not derived from 'const __gnu_cxx::__normal_iterator<_Iterator, _Container>'
-   98 |       { return __val < *__it; }
-      |                ~~~~~~^~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h: In instantiation of 'bool __gnu_cxx::__ops::_Iter_less_val::operator()(_Iterator, _Value&) const [with _Iterator = __gnu_cxx::__normal_iterator<Number*, std::vector<Number> >; _Value = Number]':
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_heap.h:140:48:   required from 'void std::__push_heap(_RandomAccessIterator, _Distance, _Distance, _Tp, _Compare&) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Distance = long int; _Tp = Number; _Compare = __gnu_cxx::__ops::_Iter_less_val]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_heap.h:247:23:   required from 'void std::__adjust_heap(_RandomAccessIterator, _Distance, _Distance, _Tp, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Distance = long int; _Tp = Number; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_heap.h:356:22:   required from 'void std::__make_heap(_RandomAccessIterator, _RandomAccessIterator, _Compare&) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1635:23:   required from 'void std::__heap_select(_RandomAccessIterator, _RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1910:25:   required from 'void std::__partial_sort(_RandomAccessIterator, _RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1926:27:   required from 'void std::__introsort_loop(_RandomAccessIterator, _RandomAccessIterator, _Size, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Size = long int; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:1947:25:   required from 'void std::__sort(_RandomAccessIterator, _RandomAccessIterator, _Compare) [with _RandomAccessIterator = __gnu_cxx::__normal_iterator<Number*, vector<Number> >; _Compare = __gnu_cxx::__ops::_Iter_less_iter]'
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_algo.h:4861:18:   required from 'void std::sort(_RAIter, _RAIter) [with _RAIter = __gnu_cxx::__normal_iterator<Number*, vector<Number> >]'
-<source>:13:14:   required from here
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:69:22: error: no match for 'operator<' (operand types are 'Number' and 'Number')
-   69 |       { return *__it < __val; }
-      |                ~~~~~~^~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1250:5: note: candidate: 'template<class _IteratorL, class _IteratorR, class _Container> bool __gnu_cxx::operator<(const __normal_iterator<_IteratorL, _Container>&, const __normal_iterator<_IteratorR, _Container>&)'
- 1250 |     operator<(const __normal_iterator<_IteratorL, _Container>& __lhs,
-      |     ^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1250:5: note:   template argument deduction/substitution failed:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:69:22: note:   'Number' is not derived from 'const __gnu_cxx::__normal_iterator<_IteratorL, _Container>'
-   69 |       { return *__it < __val; }
-      |                ~~~~~~^~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1258:5: note: candidate: 'template<class _Iterator, class _Container> bool __gnu_cxx::operator<(const __normal_iterator<_Iterator, _Container>&, const __normal_iterator<_Iterator, _Container>&)'
- 1258 |     operator<(const __normal_iterator<_Iterator, _Container>& __lhs,
-      |     ^~~~~~~~
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/stl_iterator.h:1258:5: note:   template argument deduction/substitution failed:
-/opt/compiler-explorer/gcc-13.2.0/include/c++/13.2.0/bits/predefined_ops.h:69:22: note:   'Number' is not derived from 'const __gnu_cxx::__normal_iterator<_Iterator, _Container>'
-   69 |       { return *__it < __val; }
-      |                ~~~~~~^~~~~~~
-Compiler returned: 1
-</pre>
+That small snippet can produce hundreds of lines of errors.
 
----
-<style scoped>
-pre {
-    color: white;
-    white-space: pre-wrap;
-    font-size: 12pt;
-}
-</style>
+<center>
 
-# Clang 17.0.1 - (extent of) 9 errors, 200+ lines of output
+|Compiler|Output|
+|-|-|
+|GCC 14.2|138 lines of output|
+|Clang 18.1.0|245 lines of output (9 errors)|
 
-<!-- https://godbolt.org/z/jYPszxnhz -->
+</center>
 
-<pre style="color: black;">
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/predefined_ops.h:69:22: error: invalid operands to binary expression ('Number' and 'Number')
-   69 |       { return *__it < __val; }
-      |                ~~~~~ ^ ~~~~~
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_heap.h:140:42: note: in instantiation of function template specialization '__gnu_cxx::__ops::_Iter_less_val::operator()<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, Number>' requested here
-  140 |       while (__holeIndex > __topIndex && __comp(__first + __parent, __value))
-      |                                          ^
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_heap.h:247:12: note: in instantiation of function template specialization 'std::__push_heap<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, long, Number, __gnu_cxx::__ops::_Iter_less_val>' requested here
-  247 |       std::__push_heap(__first, __holeIndex, __topIndex,
-      |            ^
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_heap.h:356:9: note: in instantiation of function template specialization 'std::__adjust_heap<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, long, Number, __gnu_cxx::__ops::_Iter_less_iter>' requested here
-  356 |           std::__adjust_heap(__first, __parent, __len, _GLIBCXX_MOVE(__value),
-      |                ^
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_algo.h:1635:12: note: in instantiation of function template specialization 'std::__make_heap<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, __gnu_cxx::__ops::_Iter_less_iter>' requested here
- 1635 |       std::__make_heap(__first, __middle, __comp);
-      |            ^
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_algo.h:1910:12: note: in instantiation of function template specialization 'std::__heap_select<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, __gnu_cxx::__ops::_Iter_less_iter>' requested here
- 1910 |       std::__heap_select(__first, __middle, __last, __comp);
-      |            ^
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_algo.h:1926:13: note: in instantiation of function template specialization 'std::__partial_sort<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, __gnu_cxx::__ops::_Iter_less_iter>' requested here
- 1926 |               std::__partial_sort(__first, __last, __last, __comp);
-      |                    ^
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_algo.h:1947:9: note: in instantiation of function template specialization 'std::__introsort_loop<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, long, __gnu_cxx::__ops::_Iter_less_iter>' requested here
- 1947 |           std::__introsort_loop(__first, __last,
-      |                ^
-/opt/compiler-explorer/gcc-13.2.0/lib/gcc/x86_64-linux-gnu/13.2.0/../../../../include/c++/13.2.0/bits/stl_algo.h:4861:12: note: in instantiation of function template specialization 'std::__sort<__gnu_cxx::__normal_iterator<Number *, std::vector<Number>>, __gnu_cxx::__ops::_Iter_less_iter>' requested here
- 4861 |       std::__sort(__first, __last, __gnu_cxx::__ops::__iter_less_iter());
-      |            ^
-</pre>
+Moreover, some knowledge about what it is trying to be instantiated and about the internals of the algorithm is required in order to be able to follow the template instantiation stack.
+
+</div>
 
 ---
 
 <div class="hcenter">
 
-# Why concepts should improve error messages?
+# <!--fit--> Why concepts should improve error messages?
 
-# TODO
+The idea is that **errors were detected too late** with plain templates. Indeed, with templates the full instantiation stack is created and if it turns out to be an error, the compiler dumps out all of it.
 
-The idea is that errors were detected too late, and now with concepts we can stop earlier the compiler.
-
-Indeed, with templates the full instantiation stack is created and if it turns out to be an error, the compiler dumps out all of it.
-
-Adding a requirement with concepts, beside being easier than before which encourages the good practice of constraining templates, it also creates intermediate error "detection" points.
+Adding a constraint **with concepts**, beside being easier than before which encourages the good practice of constraining templates, **it creates earlier error "detection" points in the instantiation stack**. Moreover, it is also an explicit requirement.
 
 </div>
 
 ---
 <!-- _class: lead -->
 
-# TODO
-# Also compilers can improve...
-"Concepts Error Messages for Humans" https://wg21.link/p2429
+## GCC
+
+```cpp
+<source>: In function 'int main()':
+<source>:20:11: error: no matching function for call to 'sort(std::vector<Num>&)'
+   20 |     ::sort(v_num);
+      |     ~~~~~~^~~~~~~
+<source>:8:6: note: candidate: 'template<class T>  requires  comparable<T> void sort(std::vector<T>&)'
+    8 | void sort(std::vector<T>& values) {
+      |      ^~~~
+<source>:8:6: note:   template argument deduction/substitution failed:
+<source>:8:6: note: constraints not satisfied
+<source>: In substitution of 'template<class T>  requires  comparable<T> void sort(std::vector<T>&) [with T = Num]':
+<source>:20:11:   required from here
+   20 |     ::sort(v_num);
+      |     ~~~~~~^~~~~~~
+<source>:5:9:   required for the satisfaction of 'comparable<T>' [with T = Num]
+<source>:5:22:   in requirements with 'const T& a', 'const T& b' [with T = Num]
+<source>:5:60: note: the required expression '(a < b)' is invalid, because
+    5 | concept comparable = requires (const T& a, const T& b) { a < b; };
+      |                                                          ~~^~~
+<source>:5:60: error: no match for 'operator<' (operand types are 'const Num' and 'const Num')
+Compiler returned: 1
+```
+
+---
+<!-- _class: lead -->
+
+## CLANG
+
+```cpp
+<source>:20:5: error: no matching function for call to 'sort'
+   20 |     ::sort(v_num);
+      |     ^~~~~~
+<source>:14:6: note: candidate template ignored: constraints not satisfied [with T = Num]
+   14 | void sort(std::vector<T>& values) {
+      |      ^
+<source>:13:29: note: because 'Num' does not satisfy 'comparable'
+   13 | template <class T> requires comparable<T>
+      |                             ^
+<source>:5:60: note: because 'a < b' would be invalid: invalid operands to binary expression ('const Num' and 'const Num')
+    5 | concept comparable = requires (const T& a, const T& b) { a < b; };
+      |                                                            ^
+1 error generated.
+Compiler returned: 1
+```
+
+---
+<div class="hcenter">
+
+This is how the code was changed for constraining the type
+
+```cpp
+template <class T>
+concept comparable = requires (const T& a, const T& b) { a < b; };
+
+template <class T> requires comparable<T>
+void sort(std::vector<T>& values) {
+    std::sort(values.begin(), values.end());
+}
+```
+
+And this is another selling point for concepts: it is not a "go big or go home" solution.
+
+Indeed you can start using them in your codebase wherever you need them without a need for a full upgrade of you codebase. This is a very useful thing, because **they allow a smooth transition** at your pace, and IMHO it encourages adoption (if you can use c++20).
+
+</div>
+
+---
+<!-- _class: lead -->
+
+This was a very simple example.
+The output is not always as nice as in this case or as we would like it to be.
+
+But at least with concepts we have a way to break the chain of template instantiation, in an expressive way.
 
 ---
 <!-- _class: lead -->
@@ -1235,8 +1222,6 @@ Adding a requirement with concepts, beside being easier than before which encour
 <!-- _class: lead -->
 
 # CRTP vs Concepts
-
-# TODO
 
 <div class="twocolumns">
 
@@ -1295,10 +1280,11 @@ struct Cylinder {
 - Previous point opens to a potential ADL issue: a user that defines a new type compatible with your library concept, cannot use free functions easily (either fully qualified name or some namespace workaround)
 
 ---
-<!-- _class: lead -->
 # `if constexpr`
 
 <div class="hcenter">
+
+This is another usage that starting from C++17 it has become common, and concepts can be helpful there too.
 
 ```cpp
 template <class T>
