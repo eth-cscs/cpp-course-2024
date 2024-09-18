@@ -21,8 +21,13 @@ option(CPP_COURSE_BUILD_CODE "Whether to build code samples." ON)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 23)
 
 if (${CPP_COURSE_BUILD_SLIDES})
     include(../slides-support/Marp.cmake)
     add_marp_slides(simd_slides simd.md)
+endif()
+
+if (${CPP_COURSE_BUILD_CODE})
+    add_executable(simd code.cpp)
 endif()
