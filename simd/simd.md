@@ -413,13 +413,19 @@ void run_cpu_kfirst_simd() {
 ```
 ---
 
+# Quiz
+
+### Which one you think is the **fastest** and which one is the **slowest** implementation?
+
+---
+
 # Results
 
 - GCC 14.2
 - Compilation flags: `-O3 -march=native`
 - GH200
 
-<img src="cpu_kfirst.png" style="width: 70%" align="center"/>
+<img src="cpu_kfirst_acc.png" style="width: 70%" align="center"/>
 
 ---
 
