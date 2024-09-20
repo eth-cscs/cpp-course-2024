@@ -65,6 +65,7 @@ size: 16:9
 
 # Vectorization in C++
 
+- Compiler auto vectorization (`-O2`, `-O3`, `-ftree-vectorize`, etc)
 - Compiler pragmas in loops (`#pragma omp simd`, `#pragma GCC ivdep`, `#pragma ivdep`, `#pragma clang loop vectorize(assume_safety) interleave(enable)`)
   - Compiler specific
   - Don't ensure vectorization
@@ -112,14 +113,14 @@ namespace stdx = std::experimental;
  
 int main()
 {
-    const auto native_simd_length{stdx::native_simd<int>::size()};
+    const auto native_simd_length{stdx::native_simd<int>::size()};    // vector length
     alignas(stdx::memory_alignment_v<stdx::native_simd<int>>)
-        std::array<int, native_simd_length * 2> a{};
-    std::iota(a.begin(), a.end(), 0); // 0 1 2 3 4 5 6 7 
-    std::array<int, native_simd_length * 2> c;
+        std::array<int, native_simd_length * 2> a{};                  // instantiate aligned array
+    std::iota(a.begin(), a.end(), 0);                                 // initialize it: 0 1 2 3 4 5 6 7 
+    std::array<int, native_simd_length * 2> c;                        // define output array
     for (std::size_t i{}; i < a.size(); i += native_simd_length) {
         stdx::native_simd<int> x;
-        stdx::native_simd<int> y{[](int k){ return k; }}; // 0 1 2 3
+        stdx::native_simd<int> y{[](int k){ return k; }};             // 0 1 2 3
         x.copy_from(&a[i], stdx::vector_aligned);
         const auto z = x + y;
         z.copy_to(&c[i], stdx::element_aligned);
@@ -189,6 +190,11 @@ stdx::native_simd<int> f(stdx::native_simd<int> x /*1 3 5 7*/, stdx::native_simd
   std::cout << "min_value: " << stdx::hmin(x) << "\n"; // min_value: 0
   std::cout << "sum: " << stdx::reduce(x) << "\n";     // sum: 12
   return x;
+}
+
+void print_cos_sin(stdx::native_simd<double> x) {
+    std::cout << "cos²(x) + sin²(x) = ";
+    print(stdx::pow(stdx::cos(x), 2) + stdx::pow(stdx::sin(x), 2));  // 1 1 1 1
 }
 ```
 
