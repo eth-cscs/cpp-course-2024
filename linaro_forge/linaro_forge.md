@@ -129,6 +129,8 @@ srun -n 4 -A csstaff -t30 -p debug ddt-client ./matrix_mult 4
 
 # DDT
 
+<img src="connect-ddt.png" style="width: 65%" align="center"/>
+
 
 ---
 
@@ -177,3 +179,33 @@ srun -n 4 -A csstaff -t30 -p debug ddt-client ./matrix_mult 4
 ---
 
 # MAP
+
+<img src="connect-map.png" style="width: 65%" align="center"/>
+
+---
+
+<img src="map-home.png" style="width: 90%" align="center"/>
+
+---
+
+<img src="c++-part.png" style="width: 90%" align="center"/>
+
+---
+
+<img src="selection.png" style="width: 90%" align="center"/>
+
+---
+
+<img src="metrics.png" style="width: 90%" align="center"/>
+
+---
+
+<img src="performance-report.png" style="width: 90%" align="center"/>
+
+---
+
+<img src="performance-report-1.png" style="width: 80%" align="center"/>
+
+---
+
+<img src="performance-report-2.png" style="width: 80%" align="center"/>
