@@ -40,10 +40,13 @@ size: 16:9
 # Forge client configuration
 
 - Forge client on local machine (Linux, MacOS)
+- License
+  - Max processes 272 / Max users 256
 
 ## `TODI` remote setup
 
-<img src="remote-connection.png" style="width: 65%" align="center"/>
+<img src="remote-connection.png" style="width: 55%" align="center"/>
+
 
 ---
 
