@@ -28,24 +28,32 @@ size: 16:9
   - Sampling profiler
   - Designed for 'hot-spot' analysis with stack traces and performance metrics
   - Supports C/C++/Fortran/Python
-  - AMD & Nvidia GPU profiling
+  - Nvidia & AMD GPU profiling (AMD not supported on CSCS)
   - Performance Reports
 - DDT
   - "Linaro DDT is an advanced debugger designed to simplify the troubleshooting and optimization of complex, high-performance computing (HPC) applications."
   - Supports C/C++/Fortran/Python
-  - AMD & Nvidia GPUs
+  - Nvidia & AMD GPUs (AMD not supported on CSCS)
+
+---
+
+# Documentation
+
+- [[Knowledge Base] Debugging](https://confluence.cscs.ch/display/KBTDS/Debugging)
+- [Linaro Forge UENV](https://eth-cscs.github.io/alps-uenv/uenv-linaro-forge/)
 
 ---
 
 # Forge client configuration
 
-- Forge client on local machine (Linux, MacOS)
+- Forge client on local machine (Linux, MacOS, Windows)
 - License
   - Max processes 272 / Max users 256
+  - We pay for support so if any feature is missing RFE is possible
 
 ## `TODI` remote setup
 
-<img src="remote-connection.png" style="width: 55%" align="center"/>
+<img src="remote-connection.png" style="width: 60%" align="center"/>
 
 
 ---
