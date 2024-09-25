@@ -24,8 +24,7 @@ size: 16:9
 ## Linaro Forge tools
 
 - MAP
-  - "Linaro MAP is a high-performance profiler designed to optimize the efficiency of software running on multicore processors."
-  - Sampling profiler
+  - "Linaro MAP is a high-performance (sampling) profiler designed to optimize the efficiency of software running on multicore processors."
   - Designed for 'hot-spot' analysis with stack traces and performance metrics
   - Supports C/C++/Fortran/Python
   - Nvidia & AMD GPU profiling (AMD not supported on CSCS)
@@ -34,6 +33,7 @@ size: 16:9
   - "Linaro DDT is an advanced debugger designed to simplify the troubleshooting and optimization of complex, high-performance computing (HPC) applications."
   - Supports C/C++/Fortran/Python
   - Nvidia & AMD GPUs (AMD not supported on CSCS)
+  - Supports containers (to be tested with CE)
 
 ---
 
