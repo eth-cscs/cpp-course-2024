@@ -106,6 +106,8 @@ using native_simd = std::experimental::simd<T, std::experimental::simd_abi::nati
 
 # Example
 
+- GCC 11+
+
 ```c++
 #include <experimental/simd>
 #include <numeric>
@@ -204,7 +206,10 @@ void print_cos_sin(stdx::native_simd<double> x) {
 
 - permute & scatter/gather [[P2664R7]](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2664r7.html)
 - Math functions
-  - Previously pain point because it was necessary to have a library with math functions with signatures (libmvec, sleef, svml, etc)
+  - Signatures with `std::simd`
+  - Vectorized math function implementations are a pain point
+    - Previously it was necessary to have a library with vectorized math functions with signatures (libmvec, sleef, svml, etc)
+    - With `std::simd` there are already some vectorized implementations
 - Constructors with std::continuous_range/std::span [[P2876R1]](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p2876r1.html)
 
 ---
