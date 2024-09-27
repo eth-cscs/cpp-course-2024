@@ -215,7 +215,7 @@ void print_cos_sin(stdx::native_simd<double> x) {
 ---
 # Performance evaluation
 
-## Nabla4 kernel (ICON)
+## Nabla4 kernel (ICON) [[Source](https://github.com/GridTools/icon_structured_benchmark/tree/cpp_course)]
 
 ```c++
 void run_cpu_kfirst() {
