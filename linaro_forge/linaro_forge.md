@@ -37,10 +37,11 @@ size: 16:9
 
 ---
 
-# Documentation
+# Resources
 
 - [[Knowledge Base] Debugging](https://confluence.cscs.ch/display/KBTDS/Debugging)
 - [Linaro Forge UENV](https://eth-cscs.github.io/alps-uenv/uenv-linaro-forge/)
+- [Client Download](https://www.linaroforge.com/download-documentation/)
 
 ---
 
@@ -66,7 +67,7 @@ size: 16:9
 
 ```bash
 uenv start --view=linaro:forge,prgenv-gnu:default prgenv-gnu/24.7 linaro-forge/24.0.2
-map -n 4 --mpi=slurm --mpiargs="-A csstaff -p debug -t 10" --profile ./matrix_mult 4
+map -n 4 --mpi=slurm --mpiargs="-A csstaff -p debug -t 10" --profile <executable> <executable_arguments>
 ```
 
 ### Local machine
@@ -90,7 +91,7 @@ map -n 4 --mpi=slurm --mpiargs="-A csstaff -p debug -t 10" --profile ./matrix_mu
 
 ```bash
 uenv start --view=linaro:forge,prgenv-gnu:default prgenv-gnu/24.7 linaro-forge/24.0.2
-srun -n 4 -A csstaff -t30 -p debug ddt-client ./matrix_mult 4
+srun -n 4 -A csstaff -t30 -p debug ddt-client  <executable> <executable_arguments>
 ```
 
 ---
