@@ -131,66 +131,25 @@ int main()
 }
 ```
 
-<!-- ```c++
-#include <cstddef>
-#include <experimental/simd>
-#include <format>
-#include <iostream>
-#include <numeric>
-namespace stdx = std::experimental;
- 
-void print(auto const& a)
-{
-    for (std::size_t i{}; i != std::size(a); ++i)
-        std::cout << a[i] << ' ';
-    std::cout << '\n';
-}
- 
-int main()
-{
-    const auto native_simd_length{stdx::native_simd<int>::size()};
-    alignas(stdx::memory_alignment_v<stdx::native_simd<int>>)
-        std::array<int, native_simd_length * 2> a{};
-    std::iota(a.begin(), a.end(), 0);
-    print(a);
-
-    std::array<int, native_simd_length * 2> c;
- 
-    for (std::size_t i{}; i < a.size(); i += native_simd_length) {
-        std::cout << std::format("[i: {}] y: ", i);
-        stdx::native_simd<int> x;
-        stdx::native_simd<int> y{[](int k){ return k; }};
-        print(y);
-        x.copy_from(&a[i], stdx::vector_aligned);
-        const auto z = x + y;
-        z.copy_to(&c[i], stdx::element_aligned);
-    }
-    print(c);
-}
-// 0 1 2 3 4 5 6 7 
-// [i: 0] y: 0 1 2 3 
-// [i: 4] y: 0 1 2 3 
-// 0 2 4 6 4 6 8 10 
-``` -->
 ---
 
 # std::simd_mask, std::where_expression, std::reduce
 
 ```c++
 template<class A>
-stdx::simd<int, A> simd_select_l(stdx::simd_mask<int, A> where_mask, stdx::simd<int, A> x, stdx::simd<int, A> y)
+stdx::simd<int, A> simd_select_l(stdx::simd_mask<int, A> where_mask, stdx::simd<int, A> a, stdx::simd<int, A> b)
 {
-    where(where_mask, x) = y;
-    return x;
+    where(where_mask, a) = b;
+    return a;
 }
 
-stdx::native_simd<int> f(stdx::native_simd<int> x /*1 3 5 7*/, stdx::native_simd<int> y /*0 2 4 6*/) {
-  x = simd_select_l(x < y, y, x);                      // 0 2 4 6
+stdx::native_simd<int> f(stdx::native_simd<int> x /*3 3 3 3*/, stdx::native_simd<int> y /*0 2 4 6*/) {
+  x = simd_select_l(x < y, y, x);                      // 0 2 3 3
   if (all_of(x <= y)) {
     std::cout << "simd_select_l works!\n";             // simd_select_l works!
   }
   std::cout << "min_value: " << stdx::hmin(x) << "\n"; // min_value: 0
-  std::cout << "sum: " << stdx::reduce(x) << "\n";     // sum: 12
+  std::cout << "sum: " << stdx::reduce(x) << "\n";     // sum: 8
   return x;
 }
 

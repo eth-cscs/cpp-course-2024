@@ -14,10 +14,10 @@ void print(auto const& a)
 }
 
 template<class A>
-stdx::simd<int, A> simd_select_l(stdx::simd_mask<int, A> where_mask, stdx::simd<int, A> x, stdx::simd<int, A> y)
+stdx::simd<int, A> simd_select_l(stdx::simd_mask<int, A> where_mask, stdx::simd<int, A> a, stdx::simd<int, A> b)
 {
-    where(where_mask, x) = y;
-    return x;
+    where(where_mask, a) = b;
+    return a;
 }
 
 stdx::native_simd<int> f(stdx::native_simd<int> x, stdx::native_simd<int> y) {
@@ -51,7 +51,7 @@ int main()
     }
     print(c);
 
-    stdx::native_simd<int> A{[](int i) { return 2 * i + 1; } };
+    stdx::native_simd<int> A{3};
     stdx::native_simd<int> B{[](int i) { return 2 * i; } };
 
     print(A);
