@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-22 Thu 11:24 -->
+<!-- 2024-09-30 Mon 11:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>2024 CSCS C++ course: modules</title>
@@ -200,20 +200,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgecb0188">1. Intro: Why do we need modules? What are modules? And what are they not?</a></li>
-<li><a href="#org8290de2">2. A brief overview of module structure and syntax</a></li>
-<li><a href="#org3765455">3. Modules in pika</a></li>
-<li><a href="#org5c5f106">4. Miscellaneous issues etc.</a></li>
-<li><a href="#orgb18a204">5. Summary</a></li>
+<li><a href="#org409cf7d">1. Intro: Why do we need modules? What are modules? And what are they not?</a></li>
+<li><a href="#org2ef366b">2. A brief overview of module structure and syntax</a></li>
+<li><a href="#orgea74246">3. Modules in pika</a></li>
+<li><a href="#orgb8fba9a">4. Miscellaneous issues etc.</a></li>
+<li><a href="#org00b9c1a">5. Summary</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgecb0188" class="outline-2">
-<h2 id="orgecb0188"><span class="section-number-2">1.</span> Intro: Why do we need modules? What are modules? And what are they not?</h2>
+<div id="outline-container-org409cf7d" class="outline-2">
+<h2 id="org409cf7d"><span class="section-number-2">1.</span> Intro: Why do we need modules? What are modules? And what are they not?</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org3c66ab0" class="outline-3">
-<h3 id="org3c66ab0"><span class="section-number-3">1.1.</span> Repeated inclusion</h3>
+<div id="outline-container-org0a73914" class="outline-3">
+<h3 id="org0a73914"><span class="section-number-3">1.1.</span> Repeated inclusion</h3>
 <div class="outline-text-3" id="text-1-1">
 <ul class="org-ul">
 <li>Headers parsed again in each translation unit</li>
@@ -222,8 +222,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-org7203547" class="outline-3">
-<h3 id="org7203547"><span class="section-number-3">1.2.</span> Transitive includes</h3>
+<div id="outline-container-orgb77edf5" class="outline-3">
+<h3 id="orgb77edf5"><span class="section-number-3">1.2.</span> Transitive includes</h3>
 <div class="outline-text-3" id="text-1-2">
 <ul class="org-ul">
 <li>Programs can compile without explicitly including everything they need</li>
@@ -234,8 +234,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-org239a147" class="outline-3">
-<h3 id="org239a147"><span class="section-number-3">1.3.</span> ODR: One definition rule</h3>
+<div id="outline-container-org8aeb4d9" class="outline-3">
+<h3 id="org8aeb4d9"><span class="section-number-3">1.3.</span> ODR: One definition rule</h3>
 <div class="outline-text-3" id="text-1-3">
 <ul class="org-ul">
 <li>Must have exactly one definition of every non-inline entity</li>
@@ -244,8 +244,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-org7ee6858" class="outline-3">
-<h3 id="org7ee6858"><span class="section-number-3">1.4.</span> Stateful includes</h3>
+<div id="outline-container-orga9b209b" class="outline-3">
+<h3 id="orga9b209b"><span class="section-number-3">1.4.</span> Stateful includes</h3>
 <div class="outline-text-3" id="text-1-4">
 <div class="org-src-container">
 <pre class="src src-c++"><span style="color: #757575;">#define</span> <span style="color: #004D40;">NDEBUG</span>
@@ -280,8 +280,8 @@
 </div>
 </div>
 </div>
-<div id="outline-container-org9d18c32" class="outline-3">
-<h3 id="org9d18c32"><span class="section-number-3">1.5.</span> Visibility</h3>
+<div id="outline-container-org0197033" class="outline-3">
+<h3 id="org0197033"><span class="section-number-3">1.5.</span> Visibility</h3>
 <div class="outline-text-3" id="text-1-5">
 <div class="org-src-container">
 <pre class="src src-c++"><span style="color: #3E2723; font-weight: bold;">struct</span> <span style="color: #0D47A1;">foo</span> <span style="color: #3E2723;">{</span>
@@ -299,8 +299,8 @@
 </div>
 </div>
 </div>
-<div id="outline-container-orge805ce3" class="outline-3">
-<h3 id="orge805ce3"><span class="section-number-3">1.6.</span> C++ modules</h3>
+<div id="outline-container-org451e61b" class="outline-3">
+<h3 id="org451e61b"><span class="section-number-3">1.6.</span> C++ modules</h3>
 <div class="outline-text-3" id="text-1-6">
 <ul class="org-ul">
 <li>C++ modules encapsulate translation units more strongly than previously
@@ -319,8 +319,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-orgf791443" class="outline-3">
-<h3 id="orgf791443"><span class="section-number-3">1.7.</span> Modules are orthogonal to namespaces</h3>
+<div id="outline-container-orgf3aebfd" class="outline-3">
+<h3 id="orgf3aebfd"><span class="section-number-3">1.7.</span> Modules are orthogonal to namespaces</h3>
 <div class="outline-text-3" id="text-1-7">
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">export</span> <span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">foo</span>;
@@ -332,8 +332,8 @@
 </div>
 </div>
 </div>
-<div id="outline-container-org7bda1cf" class="outline-3">
-<h3 id="org7bda1cf"><span class="section-number-3">1.8.</span> Modules are not hierarchical</h3>
+<div id="outline-container-org5d701c8" class="outline-3">
+<h3 id="org5d701c8"><span class="section-number-3">1.8.</span> Modules are not hierarchical</h3>
 <div class="outline-text-3" id="text-1-8">
 <ul class="org-ul">
 <li>Modules can be named <code>foo.bar.bar</code></li>
@@ -345,16 +345,16 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-orgf2da462" class="outline-3">
-<h3 id="orgf2da462"><span class="section-number-3">1.9.</span> Modules have no correspondence to filenames or the filesystem in general</h3>
+<div id="outline-container-org1b43833" class="outline-3">
+<h3 id="org1b43833"><span class="section-number-3">1.9.</span> Modules have no correspondence to filenames or the filesystem in general</h3>
 <div class="outline-text-3" id="text-1-9">
 <ul class="org-ul">
 <li>Can have a module <code>foo</code> defined in a directory <code>bar</code> implemented in a file called <code>baz.cpp</code></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org8a64378" class="outline-3">
-<h3 id="org8a64378"><span class="section-number-3">1.10.</span> Modules are not simple</h3>
+<div id="outline-container-orgc9707d0" class="outline-3">
+<h3 id="orgc9707d0"><span class="section-number-3">1.10.</span> Modules are not simple</h3>
 <div class="outline-text-3" id="text-1-10">
 <ul class="org-ul">
 <li>Can&rsquo;t leave the entire header-world behind</li>
@@ -365,15 +365,15 @@
 </div>
 </div>
 </div>
-<div id="outline-container-org8290de2" class="outline-2">
-<h2 id="org8290de2"><span class="section-number-2">2.</span> A brief overview of module structure and syntax</h2>
+<div id="outline-container-org2ef366b" class="outline-2">
+<h2 id="org2ef366b"><span class="section-number-2">2.</span> A brief overview of module structure and syntax</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li>Playground: <a href="https://godbolt.org/z/qM91dTTvY">https://godbolt.org/z/qM91dTTvY</a></li>
 </ul>
 </div>
-<div id="outline-container-orgb6bcba4" class="outline-3">
-<h3 id="orgb6bcba4"><span class="section-number-3">2.1.</span> Consuming modules is simple</h3>
+<div id="outline-container-org7c0aad9" class="outline-3">
+<h3 id="org7c0aad9"><span class="section-number-3">2.1.</span> Consuming modules is simple</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">import</span> <span style="color: #757575;">std</span>;
@@ -385,8 +385,8 @@
 </div>
 </div>
 </div>
-<div id="outline-container-org22b575d" class="outline-3">
-<h3 id="org22b575d"><span class="section-number-3">2.2.</span> Writing simple modules is simple</h3>
+<div id="outline-container-orgf7b4585" class="outline-3">
+<h3 id="orgf7b4585"><span class="section-number-3">2.2.</span> Writing simple modules is simple</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #BDBDBD;">// </span><span style="color: #BDBDBD;">define the module interface</span>
@@ -405,8 +405,8 @@
 </div>
 </div>
 </div>
-<div id="outline-container-orgf1b3359" class="outline-3">
-<h3 id="orgf1b3359"><span class="section-number-3">2.3.</span> Writing complicated modules is a bit more complicated</h3>
+<div id="outline-container-org8bdf4ae" class="outline-3">
+<h3 id="org8bdf4ae"><span class="section-number-3">2.3.</span> Writing complicated modules is a bit more complicated</h3>
 <div class="outline-text-3" id="text-2-3">
 <ul class="org-ul">
 <li><i>module unit</i></li>
@@ -420,8 +420,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-orga19b7e8" class="outline-3">
-<h3 id="orga19b7e8"><span class="section-number-3">2.4.</span> <i>Module unit</i></h3>
+<div id="outline-container-orgae44e8c" class="outline-3">
+<h3 id="orgae44e8c"><span class="section-number-3">2.4.</span> <i>Module unit</i></h3>
 <div class="outline-text-3" id="text-2-4">
 <blockquote>
 <p>
@@ -447,8 +447,8 @@ A module unit is a translation unit that contains a module-declaration.
 </div>
 </div>
 </div>
-<div id="outline-container-org472c321" class="outline-3">
-<h3 id="org472c321"><span class="section-number-3">2.5.</span> <i>Module purview</i></h3>
+<div id="outline-container-org84a0f5c" class="outline-3">
+<h3 id="org84a0f5c"><span class="section-number-3">2.5.</span> <i>Module purview</i></h3>
 <div class="outline-text-3" id="text-2-5">
 <blockquote>
 <p>
@@ -468,8 +468,8 @@ A module unit purview is the sequence of tokens starting at the module-declarati
 </div>
 </div>
 </div>
-<div id="outline-container-org0e6de55" class="outline-3">
-<h3 id="org0e6de55"><span class="section-number-3">2.6.</span> <i>Global module</i></h3>
+<div id="outline-container-org87af3b8" class="outline-3">
+<h3 id="org87af3b8"><span class="section-number-3">2.6.</span> <i>Global module</i></h3>
 <div class="outline-text-3" id="text-2-6">
 <blockquote>
 <p>
@@ -482,8 +482,8 @@ The global module is the collection of all global-module-fragments and all trans
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org4571085" class="outline-3">
-<h3 id="org4571085"><span class="section-number-3">2.7.</span> <i>Global module fragment</i></h3>
+<div id="outline-container-orgc0e23cb" class="outline-3">
+<h3 id="orgc0e23cb"><span class="section-number-3">2.7.</span> <i>Global module fragment</i></h3>
 <div class="outline-text-3" id="text-2-7">
 <blockquote>
 <p>
@@ -506,8 +506,8 @@ The global module fragment can be used to provide declarations that are attached
 </div>
 </div>
 </div>
-<div id="outline-container-org9dfa1d9" class="outline-3">
-<h3 id="org9dfa1d9"><span class="section-number-3">2.8.</span> <i>Module interface unit/Module implementation unit</i></h3>
+<div id="outline-container-org76ad01f" class="outline-3">
+<h3 id="org76ad01f"><span class="section-number-3">2.8.</span> <i>Module interface unit/Module implementation unit</i></h3>
 <div class="outline-text-3" id="text-2-8">
 <blockquote>
 <p>
@@ -534,8 +534,8 @@ A module interface unit is a module unit whose module-declaration starts with ex
 </div>
 </div>
 </div>
-<div id="outline-container-org781f9d3" class="outline-3">
-<h3 id="org781f9d3"><span class="section-number-3">2.9.</span> <i>Primary module interface unit</i></h3>
+<div id="outline-container-org9b0f5f5" class="outline-3">
+<h3 id="org9b0f5f5"><span class="section-number-3">2.9.</span> <i>Primary module interface unit</i></h3>
 <div class="outline-text-3" id="text-2-9">
 <blockquote>
 <p>
@@ -560,8 +560,8 @@ A named module shall contain exactly one module interface unit with no module-pa
 </div>
 </div>
 </div>
-<div id="outline-container-orgdbf6cbd" class="outline-3">
-<h3 id="orgdbf6cbd"><span class="section-number-3">2.10.</span> <i>Module partition</i></h3>
+<div id="outline-container-org669dc8a" class="outline-3">
+<h3 id="org669dc8a"><span class="section-number-3">2.10.</span> <i>Module partition</i></h3>
 <div class="outline-text-3" id="text-2-10">
 <blockquote>
 <p>
@@ -589,8 +589,8 @@ No diagnostic is required for a violation of these rules.
 </div>
 </div>
 </div>
-<div id="outline-container-org763cb78" class="outline-3">
-<h3 id="org763cb78"><span class="section-number-3">2.11.</span> <i>Private module fragment</i></h3>
+<div id="outline-container-org50491e8" class="outline-3">
+<h3 id="org50491e8"><span class="section-number-3">2.11.</span> <i>Private module fragment</i></h3>
 <div class="outline-text-3" id="text-2-11">
 <blockquote>
 <p>
@@ -612,8 +612,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-org3765455" class="outline-2">
-<h2 id="org3765455"><span class="section-number-2">3.</span> Modules in pika</h2>
+<div id="outline-container-orgea74246" class="outline-2">
+<h2 id="orgea74246"><span class="section-number-2">3.</span> Modules in pika</h2>
 <div class="outline-text-2" id="text-3">
 <ul class="org-ul">
 <li>Plan: convert pika to use modules (<a href="https://github.com/pika-org/pika">https://github.com/pika-org/pika</a>)</li>
@@ -624,8 +624,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul></li>
 </ul>
 </div>
-<div id="outline-container-org7039bda" class="outline-3">
-<h3 id="org7039bda"><span class="section-number-3">3.1.</span> Prerequisites</h3>
+<div id="outline-container-org4ee81b7" class="outline-3">
+<h3 id="org4ee81b7"><span class="section-number-3">3.1.</span> Prerequisites</h3>
 <div class="outline-text-3" id="text-3-1">
 <ul class="org-ul">
 <li>I used:
@@ -639,8 +639,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc460cf2" class="outline-3">
-<h3 id="orgc460cf2"><span class="section-number-3">3.2.</span> pika&rsquo;s existing &ldquo;module&rdquo; structure</h3>
+<div id="outline-container-org5d67b27" class="outline-3">
+<h3 id="org5d67b27"><span class="section-number-3">3.2.</span> pika&rsquo;s existing &ldquo;module&rdquo; structure</h3>
 <div class="outline-text-3" id="text-3-2">
 <ul class="org-ul">
 <li><code>pika/</code>
@@ -666,8 +666,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-org58d87ed" class="outline-3">
-<h3 id="org58d87ed"><span class="section-number-3">3.3.</span> pika&rsquo;s existing &ldquo;module&rdquo; structure</h3>
+<div id="outline-container-org7b49886" class="outline-3">
+<h3 id="org7b49886"><span class="section-number-3">3.3.</span> pika&rsquo;s existing &ldquo;module&rdquo; structure</h3>
 <div class="outline-text-3" id="text-3-3">
 <ul class="org-ul">
 <li>Each &ldquo;module&rdquo; compiled into an object library</li>
@@ -677,8 +677,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-org2237036" class="outline-3">
-<h3 id="org2237036"><span class="section-number-3">3.4.</span> pika&rsquo;s C++ modules structure</h3>
+<div id="outline-container-orge2538c1" class="outline-3">
+<h3 id="orge2538c1"><span class="section-number-3">3.4.</span> pika&rsquo;s C++ modules structure</h3>
 <div class="outline-text-3" id="text-3-4">
 <ul class="org-ul">
 <li>Each &ldquo;module&rdquo; becomes a C++ module: <code>pika.execution</code> etc.</li>
@@ -696,8 +696,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-orge6c3adb" class="outline-3">
-<h3 id="orge6c3adb"><span class="section-number-3">3.5.</span> Step 1: defining a module</h3>
+<div id="outline-container-org50dabf2" class="outline-3">
+<h3 id="org50dabf2"><span class="section-number-3">3.5.</span> Step 1: defining a module</h3>
 <div class="outline-text-3" id="text-3-5">
 <ul class="org-ul">
 <li>New <code>module.cpp</code> file generated for each pika module, defines module interface</li>
@@ -722,8 +722,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-org0a9c535" class="outline-3">
-<h3 id="org0a9c535"><span class="section-number-3">3.6.</span> Step 2: header files</h3>
+<div id="outline-container-org16bc432" class="outline-3">
+<h3 id="org16bc432"><span class="section-number-3">3.6.</span> Step 2: header files</h3>
 <div class="outline-text-3" id="text-3-6">
 <ul class="org-ul">
 <li>Only keep includes internal to the module (and macro includes) in header files</li>
@@ -748,8 +748,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-orgd885f6c" class="outline-3">
-<h3 id="orgd885f6c"><span class="section-number-3">3.7.</span> Step 3: cpp files</h3>
+<div id="outline-container-org65c8d65" class="outline-3">
+<h3 id="org65c8d65"><span class="section-number-3">3.7.</span> Step 3: cpp files</h3>
 <div class="outline-text-3" id="text-3-7">
 <ul class="org-ul">
 <li>Transform cpp files to module implementation units</li>
@@ -772,8 +772,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-orga84f969" class="outline-3">
-<h3 id="orga84f969"><span class="section-number-3">3.8.</span> Step 4: macros&#x2026;</h3>
+<div id="outline-container-org7ab46bd" class="outline-3">
+<h3 id="org7ab46bd"><span class="section-number-3">3.8.</span> Step 4: macros&#x2026;</h3>
 <div class="outline-text-3" id="text-3-8">
 <ul class="org-ul">
 <li><code>PIKA_ASSERT</code>, <code>PIKA_LOG</code>, and <code>PIKA_VERSION</code> etc.</li>
@@ -794,8 +794,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-org060049f" class="outline-3">
-<h3 id="org060049f"><span class="section-number-3">3.9.</span> Step 4: macros&#x2026;</h3>
+<div id="outline-container-org0ab9fb3" class="outline-3">
+<h3 id="org0ab9fb3"><span class="section-number-3">3.9.</span> Step 4: macros&#x2026;</h3>
 <div class="outline-text-3" id="text-3-9">
 <ul class="org-ul">
 <li>Not all compilers support function-like macro definitions on the command line
@@ -832,8 +832,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-orga096c9e" class="outline-3">
-<h3 id="orga096c9e"><span class="section-number-3">3.10.</span> Step 5: define <code>pika.all</code> module</h3>
+<div id="outline-container-org2fdfa75" class="outline-3">
+<h3 id="org2fdfa75"><span class="section-number-3">3.10.</span> Step 5: define <code>pika.all</code> module</h3>
 <div class="outline-text-3" id="text-3-10">
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">pika.all</span>;
@@ -846,8 +846,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-org4db6abb" class="outline-3">
-<h3 id="org4db6abb"><span class="section-number-3">3.11.</span> Step 6: define <code>pika</code> module</h3>
+<div id="outline-container-org0d7e040" class="outline-3">
+<h3 id="org0d7e040"><span class="section-number-3">3.11.</span> Step 6: define <code>pika</code> module</h3>
 <div class="outline-text-3" id="text-3-11">
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #3E2723; font-weight: bold;">module</span> <span style="color: #757575;">pika</span>;
@@ -866,8 +866,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-org0ffca8d" class="outline-3">
-<h3 id="org0ffca8d"><span class="section-number-3">3.12.</span> CMake configuration</h3>
+<div id="outline-container-org519ab1f" class="outline-3">
+<h3 id="org519ab1f"><span class="section-number-3">3.12.</span> CMake configuration</h3>
 <div class="outline-text-3" id="text-3-12">
 <ul class="org-ul">
 <li>Should be supported by CMake, meson, build2, and possibly others
@@ -891,8 +891,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-orgc32e08f" class="outline-3">
-<h3 id="orgc32e08f"><span class="section-number-3">3.13.</span> Test executable</h3>
+<div id="outline-container-orgf2f4a1c" class="outline-3">
+<h3 id="orgf2f4a1c"><span class="section-number-3">3.13.</span> Test executable</h3>
 <div class="outline-text-3" id="text-3-13">
 <ul class="org-ul">
 <li>NB. This particular example does not work on the <code>modules</code> branch since not all pika modules were translated</li>
@@ -917,8 +917,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-org4eb64ab" class="outline-3">
-<h3 id="org4eb64ab"><span class="section-number-3">3.14.</span> A better module implementation for pika?</h3>
+<div id="outline-container-org912090c" class="outline-3">
+<h3 id="org912090c"><span class="section-number-3">3.14.</span> A better module implementation for pika?</h3>
 <div class="outline-text-3" id="text-3-14">
 <ul class="org-ul">
 <li>Don&rsquo;t export everything from every module
@@ -934,8 +934,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-org49284b3" class="outline-3">
-<h3 id="org49284b3"><span class="section-number-3">3.15.</span> Build times</h3>
+<div id="outline-container-org7acab12" class="outline-3">
+<h3 id="org7acab12"><span class="section-number-3">3.15.</span> Build times</h3>
 <div class="outline-text-3" id="text-3-15">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -996,8 +996,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </p>
 </div>
 </div>
-<div id="outline-container-org5cfeeb5" class="outline-3">
-<h3 id="org5cfeeb5"><span class="section-number-3">3.16.</span> Binary sizes (release mode)</h3>
+<div id="outline-container-org5b7475f" class="outline-3">
+<h3 id="org5b7475f"><span class="section-number-3">3.16.</span> Binary sizes (release mode)</h3>
 <div class="outline-text-3" id="text-3-16">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -1039,33 +1039,33 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-org9f34624" class="outline-3">
-<h3 id="org9f34624"><span class="section-number-3">3.17.</span> Build graph (no modules)</h3>
+<div id="outline-container-org0e4ea27" class="outline-3">
+<h3 id="org0e4ea27"><span class="section-number-3">3.17.</span> Build graph (no modules)</h3>
 <div class="outline-text-3" id="text-3-17">
 
-<div id="org874be35" class="figure">
+<div id="org08cf4b8" class="figure">
 <p><img src="./pika_nomodules_ninja.svg" alt="pika_nomodules_ninja.svg" class="org-svg" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgb7460d5" class="outline-3">
-<h3 id="orgb7460d5"><span class="section-number-3">3.18.</span> Build graph (modules)</h3>
+<div id="outline-container-orge8d85cf" class="outline-3">
+<h3 id="orge8d85cf"><span class="section-number-3">3.18.</span> Build graph (modules)</h3>
 <div class="outline-text-3" id="text-3-18">
 
-<div id="org82a70aa" class="figure">
+<div id="orge2df545" class="figure">
 <p><img src="./pika_modules_ninja.svg" alt="pika_modules_ninja.svg" class="org-svg" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org5c5f106" class="outline-2">
-<h2 id="org5c5f106"><span class="section-number-2">4.</span> Miscellaneous issues etc.</h2>
+<div id="outline-container-orgb8fba9a" class="outline-2">
+<h2 id="orgb8fba9a"><span class="section-number-2">4.</span> Miscellaneous issues etc.</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org6987124" class="outline-3">
-<h3 id="org6987124"><span class="section-number-3">4.1.</span> CMake</h3>
+<div id="outline-container-org5b73fd7" class="outline-3">
+<h3 id="org5b73fd7"><span class="section-number-3">4.1.</span> CMake</h3>
 <div class="outline-text-3" id="text-4-1">
 <ul class="org-ul">
 <li>Segfault if files not in correct file set
@@ -1080,8 +1080,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-orgfb7e5ab" class="outline-3">
-<h3 id="orgfb7e5ab"><span class="section-number-3">4.2.</span> GCC</h3>
+<div id="outline-container-org1c75948" class="outline-3">
+<h3 id="org1c75948"><span class="section-number-3">4.2.</span> GCC</h3>
 <div class="outline-text-3" id="text-4-2">
 <ul class="org-ul">
 <li>ICE including too many headers in global module fragment?
@@ -1097,8 +1097,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </ul>
 </div>
 </div>
-<div id="outline-container-org91b8f8a" class="outline-3">
-<h3 id="org91b8f8a"><span class="section-number-3">4.3.</span> clang</h3>
+<div id="outline-container-org097ec9d" class="outline-3">
+<h3 id="org097ec9d"><span class="section-number-3">4.3.</span> clang</h3>
 <div class="outline-text-3" id="text-4-3">
 <ul class="org-ul">
 <li>Generally good, including error messages!</li>
@@ -1126,8 +1126,8 @@ A module unit with a private-module-fragment shall be the only module unit of it
 </div>
 </div>
 </div>
-<div id="outline-container-orgb80b55f" class="outline-3">
-<h3 id="orgb80b55f"><span class="section-number-3">4.4.</span> Name mangling</h3>
+<div id="outline-container-org4ac4383" class="outline-3">
+<h3 id="org4ac4383"><span class="section-number-3">4.4.</span> Name mangling</h3>
 <div class="outline-text-3" id="text-4-4">
 <ul class="org-ul">
 <li>Names attached to a module <code>m</code> are suffixed with <code>@m</code></li>
@@ -1143,8 +1143,8 @@ note:                 <span style="color: #1A237E;">'template&lt;class ... _Bn&g
 </div>
 </div>
 </div>
-<div id="outline-container-org5d583a4" class="outline-3">
-<h3 id="org5d583a4"><span class="section-number-3">4.5.</span> Including headers in multiple modules</h3>
+<div id="outline-container-org3d8b431" class="outline-3">
+<h3 id="org3d8b431"><span class="section-number-3">4.5.</span> Including headers in multiple modules</h3>
 <div class="outline-text-3" id="text-4-5">
 <ul class="org-ul">
 <li>Names are attached to a module, can&rsquo;t define or declare them in different modules</li>
@@ -1164,8 +1164,8 @@ pika/libs/pika/type_support/include/pika/type_support/pack.hpp:17:12: note: prev
 </div>
 </div>
 </div>
-<div id="outline-container-org0c5968b" class="outline-3">
-<h3 id="org0c5968b"><span class="section-number-3">4.6.</span> <code>extern "C++"</code></h3>
+<div id="outline-container-org28aeed7" class="outline-3">
+<h3 id="org28aeed7"><span class="section-number-3">4.6.</span> <code>extern "C++"</code></h3>
 <div class="outline-text-3" id="text-4-6">
 <ul class="org-ul">
 <li>All definitions within the module purview attached to a module</li>
@@ -1194,8 +1194,8 @@ pika/libs/pika/type_support/include/pika/type_support/pack.hpp:17:12: note: prev
 </div>
 </div>
 </div>
-<div id="outline-container-orgf6983e5" class="outline-3">
-<h3 id="orgf6983e5"><span class="section-number-3">4.7.</span> static in headers</h3>
+<div id="outline-container-orgbed302d" class="outline-3">
+<h3 id="orgbed302d"><span class="section-number-3">4.7.</span> static in headers</h3>
 <div class="outline-text-3" id="text-4-7">
 <ul class="org-ul">
 <li>Static functions and variables included through headers in global module fragment are not visible in module purview
@@ -1221,8 +1221,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </div>
 </div>
 </div>
-<div id="outline-container-org15c81c2" class="outline-3">
-<h3 id="org15c81c2"><span class="section-number-3">4.8.</span> static in headers</h3>
+<div id="outline-container-org5496c65" class="outline-3">
+<h3 id="org5496c65"><span class="section-number-3">4.8.</span> static in headers</h3>
 <div class="outline-text-3" id="text-4-8">
 <ul class="org-ul">
 <li>Can&rsquo;t use static inside <code>export {}</code> block</li>
@@ -1247,8 +1247,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </div>
 </div>
 </div>
-<div id="outline-container-orgfef3548" class="outline-3">
-<h3 id="orgfef3548"><span class="section-number-3">4.9.</span> Modules require explicit import</h3>
+<div id="outline-container-org9bb53ca" class="outline-3">
+<h3 id="org9bb53ca"><span class="section-number-3">4.9.</span> Modules require explicit import</h3>
 <div class="outline-text-3" id="text-4-9">
 <ul class="org-ul">
 <li>No more accidental transitive includes</li>
@@ -1263,8 +1263,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </div>
 </div>
 </div>
-<div id="outline-container-orge828d11" class="outline-3">
-<h3 id="orge828d11"><span class="section-number-3">4.10.</span> import std</h3>
+<div id="outline-container-orgbf79277" class="outline-3">
+<h3 id="orgbf79277"><span class="section-number-3">4.10.</span> import std</h3>
 <div class="outline-text-3" id="text-4-10">
 <ul class="org-ul">
 <li><code>import std</code> and <code>import std.compat</code> added in C++23
@@ -1285,8 +1285,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </ul>
 </div>
 </div>
-<div id="outline-container-org3e8a55b" class="outline-3">
-<h3 id="org3e8a55b"><span class="section-number-3">4.11.</span> ADL with modules</h3>
+<div id="outline-container-org40fef29" class="outline-3">
+<h3 id="org40fef29"><span class="section-number-3">4.11.</span> ADL with modules</h3>
 <div class="outline-text-3" id="text-4-11">
 <ul class="org-ul">
 <li>Big topic of <i>reachability</i></li>
@@ -1324,8 +1324,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </div>
 </div>
 </div>
-<div id="outline-container-org01334f4" class="outline-3">
-<h3 id="org01334f4"><span class="section-number-3">4.12.</span> ADL with modules</h3>
+<div id="outline-container-orgf1099a4" class="outline-3">
+<h3 id="orgf1099a4"><span class="section-number-3">4.12.</span> ADL with modules</h3>
 <div class="outline-text-3" id="text-4-12">
 <ul class="org-ul">
 <li>Big topic of <i>reachability</i></li>
@@ -1367,8 +1367,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </div>
 </div>
 </div>
-<div id="outline-container-org89edf22" class="outline-3">
-<h3 id="org89edf22"><span class="section-number-3">4.13.</span> Unexplored</h3>
+<div id="outline-container-orgb2ee3b9" class="outline-3">
+<h3 id="orgb2ee3b9"><span class="section-number-3">4.13.</span> Unexplored</h3>
 <div class="outline-text-3" id="text-4-13">
 <ul class="org-ul">
 <li>Header units
@@ -1389,8 +1389,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </div>
 </div>
 </div>
-<div id="outline-container-orgb18a204" class="outline-2">
-<h2 id="orgb18a204"><span class="section-number-2">5.</span> Summary</h2>
+<div id="outline-container-org00b9c1a" class="outline-2">
+<h2 id="org00b9c1a"><span class="section-number-2">5.</span> Summary</h2>
 <div class="outline-text-2" id="text-5">
 <ul class="org-ul">
 <li>Modules are
@@ -1408,8 +1408,8 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 </ul></li>
 </ul>
 </div>
-<div id="outline-container-orgaf7d174" class="outline-3">
-<h3 id="orgaf7d174"><span class="section-number-3">5.1.</span> Resources</h3>
+<div id="outline-container-orgb2b26a9" class="outline-3">
+<h3 id="orgb2b26a9"><span class="section-number-3">5.1.</span> Resources</h3>
 <div class="outline-text-3" id="text-5-1">
 <ul class="org-ul">
 <li><a href="https://eel.is/c++draft/module">https://eel.is/c++draft/module</a></li>
@@ -1428,13 +1428,14 @@ include/boost/intrusive/slist.hpp:580:28: error: no matching <span style="color:
 <li><a href="https://wg21.link/p1441">https://wg21.link/p1441</a></li>
 <li><a href="https://wg21.link/p1689">https://wg21.link/p1689</a></li>
 <li><a href="https://wg21.link/p1788">https://wg21.link/p1788</a></li>
+<li><a href="https://wg21.link/p3034">https://wg21.link/p3034</a></li>
 </ul>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-08-22 Thu 11:24</p>
+<p class="date">Created: 2024-09-30 Mon 11:47</p>
 </div>
 </body>
 </html>
