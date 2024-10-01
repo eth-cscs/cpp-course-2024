@@ -49,7 +49,7 @@ size: 16:9
 
 - Forge client on local machine (Linux, MacOS, Windows)
 - License
-  - Max processes 272 / Max users 256
+  - Max processes 128
   - We pay for support so if any feature is missing RFE is possible
 
 ## `TODI` remote setup
