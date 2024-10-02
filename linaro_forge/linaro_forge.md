@@ -49,7 +49,7 @@ size: 16:9
 
 - Forge client on local machine (Linux, MacOS, Windows)
 - License
-  - Max processes 128
+  - Max processes: 128 on Todi / 272 on Balfrin
   - We pay for support so if any feature is missing RFE is possible
 
 ## `TODI` remote setup
@@ -172,6 +172,10 @@ srun -n 4 -A csstaff -t30 -p debug ddt-client  <executable> <executable_argument
 ---
 
 <img src="breakpoint-stop.png" style="width: 90%" align="center"/>
+
+---
+
+<img src="ddt-matrix.png" style="width: 90%" align="center"/>
 
 ---
 
